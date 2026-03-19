@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Provides AI-driven recommendations for SEO optimization.
@@ -64,15 +65,7 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
     outputSchema: GetSeoOptimizationSuggestionsOutputSchema,
   },
   async (input) => {
-    try {
-      const { output } = await getSeoOptimizationSuggestionsPrompt(input);
-      return output!;
-    } catch (error) {
-      console.warn('Primary Gemini model failed, falling back to Grok AI for analysis:', error);
-      const { output } = await getSeoOptimizationSuggestionsPrompt(input, {
-        model: 'openai/grok-beta'
-      });
-      return output!;
-    }
+    const { output } = await getSeoOptimizationSuggestionsPrompt(input);
+    return output!;
   }
 );

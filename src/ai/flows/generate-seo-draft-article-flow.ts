@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Genkit flow for generating SEO-optimized draft articles or outlines.
@@ -125,15 +126,7 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
       isOutline: input.outputFormat === 'outline',
     };
 
-    try {
-      const {output} = await prompt(promptInput);
-      return output!;
-    } catch (error) {
-      console.warn('Primary Gemini model failed, falling back to Grok AI:', error);
-      const {output} = await prompt(promptInput, {
-        model: 'openai/grok-beta'
-      });
-      return output!;
-    }
+    const {output} = await prompt(promptInput);
+    return output!;
   }
 );
