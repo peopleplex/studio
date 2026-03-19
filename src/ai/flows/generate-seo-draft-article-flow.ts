@@ -126,7 +126,23 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
       isOutline: input.outputFormat === 'outline',
     };
 
-    const {output} = await prompt(promptInput);
-    return output!;
+    try {
+      // Primary Attempt: Gemini
+      const {output} = await prompt(promptInput);
+      return output!;
+    } catch (geminiError: any) {
+      console.warn('Gemini error, attempting Grok fallback:', geminiError.message);
+      
+      try {
+        // Fallback Attempt: Grok AI
+        const {output} = await prompt(promptInput, {
+          model: 'openai/grok-beta',
+        });
+        return output!;
+      } catch (fallbackError: any) {
+        console.error('All AI providers failed:', fallbackError.message);
+        throw fallbackError;
+      }
+    }
   }
 );
