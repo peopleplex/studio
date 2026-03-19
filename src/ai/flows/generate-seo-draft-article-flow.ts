@@ -108,7 +108,8 @@ Generate a detailed outline for an article:
 - Reflect the {{{tone}}} tone in the suggested content points.
 - Use markdown formatting.
 {{/if}}
-`,
+
+Please provide the final output in the required JSON format, with the article prose or outline structure in the 'content' field.`,
 });
 
 const generateSeoDraftArticleFlow = ai.defineFlow(
