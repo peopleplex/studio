@@ -126,15 +126,7 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
       isOutline: input.outputFormat === 'outline',
     };
 
-    try {
-      const {output} = await prompt(promptInput);
-      return output!;
-    } catch (error: any) {
-      if (error.message?.includes('quota') || error.message?.includes('429')) {
-        const {output} = await prompt(promptInput, { model: 'openai/grok-beta' });
-        return output!;
-      }
-      throw error;
-    }
+    const {output} = await prompt(promptInput);
+    return output!;
   }
 );
