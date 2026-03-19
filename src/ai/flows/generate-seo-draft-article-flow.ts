@@ -37,6 +37,12 @@ export type GenerateSeoDraftArticleOutput = z.infer<
   typeof GenerateSeoDraftArticleOutputSchema
 >;
 
+// Internal schema for the prompt that includes pre-calculated flags
+const InternalPromptInputSchema = GenerateSeoDraftArticleInputSchema.extend({
+  isArticle: z.boolean(),
+  isOutline: z.boolean(),
+});
+
 export async function generateSeoDraftArticle(
   input: GenerateSeoDraftArticleInput
 ): Promise<GenerateSeoDraftArticleOutput> {
@@ -45,7 +51,7 @@ export async function generateSeoDraftArticle(
 
 const prompt = ai.definePrompt({
   name: 'generateSeoDraftArticlePrompt',
-  input: {schema: GenerateSeoDraftArticleInputSchema},
+  input: {schema: InternalPromptInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
   prompt: `You are a professional AI content writer specializing in SEO, E.E.A.T (Expertise, Authoritativeness, Trustworthiness), and G.E.O. (Generative Engine Optimization) principles. Your goal is to generate high-quality content that ranks well on traditional search engines and is optimized for AI-driven search (e.g., SearchGPT, Google SGE, Perplexity).
 
@@ -71,7 +77,7 @@ For G.E.O (Generative Engine Optimization):
 - Use structured data formatting (like tables or clear lists) where appropriate.
 - Ensure the tone is authoritative and helpful.
 
-{{#if (eq outputFormat "article")}}
+{{#if isArticle}}
 Generate a full, detailed article following these guidelines:
 - Include a compelling title.
 - Start with an engaging introduction that hooks the reader and summarizes the value.
@@ -82,7 +88,9 @@ Generate a full, detailed article following these guidelines:
 {{#if targetWordCount}}- Aim for a length close to {{{targetWordCount}}} words.{{else}}- Aim for a comprehensive length (1000+ words).{{/if}}
 - Ensure the overall tone is strictly {{{tone}}}.
 - Use markdown formatting.
-{{else if (eq outputFormat "outline")}}
+{{/if}}
+
+{{#if isOutline}}
 Generate a detailed outline for an article:
 - Include a proposed title.
 - Structure with clear headings (H1, H2, H3) that logically flow.
@@ -101,7 +109,11 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
     outputSchema: GenerateSeoDraftArticleOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
+    const {output} = await prompt({
+      ...input,
+      isArticle: input.outputFormat === 'article',
+      isOutline: input.outputFormat === 'outline',
+    });
     return output!;
   }
 );
