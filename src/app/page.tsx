@@ -21,6 +21,8 @@ import {
   Sheet,
   SheetContent,
   SheetTrigger,
+  SheetTitle,
+  SheetDescription,
 } from "@/components/ui/sheet"
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -359,6 +361,8 @@ export default function RankForgeEditor() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-[300px]">
+                <SheetTitle className="sr-only">Forge Parameters</SheetTitle>
+                <SheetDescription className="sr-only">Configure your SEO content parameters and AI tools.</SheetDescription>
                 <LeftPanelContent />
               </SheetContent>
             </Sheet>
@@ -397,6 +401,8 @@ export default function RankForgeEditor() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="p-0 w-[320px] sm:w-[380px]">
+                <SheetTitle className="sr-only">SEO Intelligence</SheetTitle>
+                <SheetDescription className="sr-only">View SEO metrics and G.E.O optimization suggestions.</SheetDescription>
                 <SeoPanel 
                   metrics={metrics} 
                   suggestions={suggestions} 
