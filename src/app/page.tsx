@@ -135,11 +135,12 @@ export default function RankForgeEditor() {
         title: 'Content Forged',
         description: `Your ${format} is complete. Switched to Preview mode for readability.`,
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Forge Error Detail:', error);
       toast({
         variant: 'destructive',
         title: 'Forge Error',
-        description: 'Failed to generate content. Please check your connection.',
+        description: error.message || 'Failed to generate content. Please check your API key or connection.',
       });
     } finally {
       setIsGenerating(false);
