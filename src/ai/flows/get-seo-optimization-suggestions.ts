@@ -65,7 +65,15 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
     outputSchema: GetSeoOptimizationSuggestionsOutputSchema,
   },
   async (input) => {
-    const { output } = await getSeoOptimizationSuggestionsPrompt(input);
-    return output!;
+    try {
+      const { output } = await getSeoOptimizationSuggestionsPrompt(input);
+      return output!;
+    } catch (error: any) {
+      if (error.message?.includes('quota') || error.message?.includes('429')) {
+        const { output } = await getSeoOptimizationSuggestionsPrompt(input, { model: 'openai/grok-beta' });
+        return output!;
+      }
+      throw error;
+    }
   }
 );
