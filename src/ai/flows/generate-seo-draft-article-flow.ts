@@ -15,11 +15,13 @@ const GenerateSeoDraftArticleInputSchema = z.object({
   keywords:
     z.array(z.string()).describe('A list of target keywords to be incorporated into the article for SEO purposes.'),
   audienceInsights:
-    z.string().describe('Information about the target audience, their interests, and what they search for.'),
+    z.string().optional().describe('Optional: Information about the target audience. If not provided, deduce it from the topic.'),
   outputFormat:
     z.enum(['article', 'outline']).describe("The desired output format: 'article' for a full draft, 'outline' for a structured outline."),
   companyName: z.string().optional().describe('The name of the company or brand the content is for.'),
+  companyDescription: z.string().optional().describe('Overview of the company to establish E.E.A.T.'),
   targetWordCount: z.number().optional().describe('The target length of the article in words.'),
+  geoOptimization: z.string().optional().describe('Focus for Generative Engine Optimization (e.g., SearchGPT, Google Overview).'),
 });
 export type GenerateSeoDraftArticleInput = z.infer<
   typeof GenerateSeoDraftArticleInputSchema
@@ -44,36 +46,46 @@ const prompt = ai.definePrompt({
   name: 'generateSeoDraftArticlePrompt',
   input: {schema: GenerateSeoDraftArticleInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
-  prompt: `You are a professional AI content writer specializing in SEO, E.E.A.T (Expertise, Authoritativeness, Trustworthiness), and G.E.O. (Geographic Optimization, if applicable) principles. Your goal is to generate high-quality content that ranks well on search engines.
+  prompt: `You are a professional AI content writer specializing in SEO, E.E.A.T (Expertise, Authoritativeness, Trustworthiness), and G.E.O. (Generative Engine Optimization) principles. Your goal is to generate high-quality content that ranks well on traditional search engines and is optimized for AI-driven search (e.g., SearchGPT, Google SGE, Perplexity).
 
-Based on the following information, please generate a {{outputFormat}} that is SEO-optimized and incorporates the provided keywords naturally. Ensure the content is structured for readability and engages the target audience.
+Based on the following information, please generate a {{outputFormat}} that is SEO-optimized and incorporates the provided keywords naturally.
 
 Topic: {{{topic}}}
 {{#if companyName}}Company Name: {{{companyName}}}{{/if}}
+{{#if companyDescription}}Company Description: {{{companyDescription}}}{{/if}}
 Target Keywords: {{#each keywords}} "{{this}}"{{#unless @last}}, {{/unless}}{{/each}}
-Audience Insights: {{{audienceInsights}}}
+{{#if geoOptimization}}G.E.O Focus (AI Search Optimization): {{{geoOptimization}}}{{/if}}
 {{#if targetWordCount}}Desired Word Count: {{{targetWordCount}}} words{{/if}}
+
+{{#if audienceInsights}}
+Audience Insights: {{{audienceInsights}}}
+{{else}}
+Note: No specific audience provided. Please identify and target the most relevant professional or consumer audience for this topic.
+{{/if}}
+
+For G.E.O (Generative Engine Optimization):
+- Structure content to be easily parsed by LLMs.
+- Provide clear, direct answers to common questions within the text.
+- Use structured data formatting (like tables or clear lists) where appropriate.
+- Ensure the tone is authoritative and helpful.
 
 {{#if (eq outputFormat "article")}}
 Generate a full, detailed article following these guidelines:
 - Include a compelling title.
-- Start with an engaging introduction that hooks the reader and clearly states what the article will cover.
-- Break down the article into logical sections with clear headings and subheadings (H1, H2, H3).
-- Integrate the target keywords naturally throughout the content.
-{{#if companyName}}- Mention {{{companyName}}} where appropriate and relevant to the context to build brand authority.{{/if}}
-- Provide valuable, accurate, and expert-level information to demonstrate E.E.A.T.
-- Ensure the tone and style resonate with the target audience.
-- Conclude with a strong summary and a clear call to action (if appropriate).
-{{#if targetWordCount}}- Aim for a length close to {{{targetWordCount}}} words.{{else}}- Aim for a comprehensive length, typically over 1000 words.{{/if}}
-- Use markdown formatting for headings and lists.
+- Start with an engaging introduction that hooks the reader and summarizes the value.
+- Break down the article into logical sections with clear headings (H1, H2, H3).
+- Integrate keywords naturally.
+{{#if companyName}}- Mention {{{companyName}}} strategically to build brand authority.{{/if}}
+- Provide expert-level information to demonstrate E.E.A.T.
+{{#if targetWordCount}}- Aim for a length close to {{{targetWordCount}}} words.{{else}}- Aim for a comprehensive length (1000+ words).{{/if}}
+- Use markdown formatting.
 {{else if (eq outputFormat "outline")}}
-Generate a detailed outline for an article following these guidelines:
-- Include a proposed title for the article.
-- Structure the outline with clear main headings (H1) and subheadings (H2, H3) that logically flow through the topic.
-- For each section, briefly describe the key points and information to be covered, and suggest where target keywords can be naturally integrated.
-{{#if companyName}}- Indicate strategic placements where the company "{{{companyName}}}" should be highlighted.{{/if}}
-- The outline should demonstrate how E.E.A.T. and G.E.O. principles will be addressed.
-- Use markdown formatting for headings and lists.
+Generate a detailed outline for an article:
+- Include a proposed title.
+- Structure with clear headings (H1, H2, H3) that logically flow.
+- Briefly describe key points for each section and where to integrate G.E.O strategies.
+{{#if companyName}}- Indicate strategic placements for company mentions.{{/if}}
+- Use markdown formatting.
 {{/if}}
 `,
 });

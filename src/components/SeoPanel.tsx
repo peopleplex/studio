@@ -4,7 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { CheckCircle2, AlertCircle, Info, Sparkles, MapPin, Search, Type, Link as LinkIcon, Zap, BarChart3, TrendingUp } from 'lucide-react';
+import { CheckCircle2, Sparkles, MapPin, Search, Type, Link as LinkIcon, Zap, BarChart3, TrendingUp, BrainCircuit } from 'lucide-react';
 import type { SeoMetrics } from '@/lib/seo-utils';
 import type { GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
 
@@ -31,13 +31,13 @@ export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelP
   return (
     <div className="flex flex-col h-full bg-white">
       <div className="p-4 border-b bg-slate-50/50">
-        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Content Intelligence</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Forge Intelligence</h2>
         
         <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">SEO Forge Score</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Visibility Score</span>
             <Badge variant="outline" className={`text-[10px] border-none font-bold ${getScoreColor(metrics.score)} bg-opacity-10`}>
-              {metrics.score >= 80 ? 'Optimized' : metrics.score >= 50 ? 'Needs Refining' : 'Low Reach'}
+              {metrics.score >= 80 ? 'Highly Visible' : metrics.score >= 50 ? 'Developing' : 'Low Visibility'}
             </Badge>
           </div>
           
@@ -51,8 +51,8 @@ export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelP
           <div className="space-y-2">
             <Progress value={metrics.score} className={`h-1.5 ${getProgressColor(metrics.score)}`} />
             <div className="flex justify-between text-[9px] font-bold text-slate-400">
-              <span>CRITICAL</span>
-              <span>EXCELLENT</span>
+              <span>TRADITIONAL</span>
+              <span>G.E.O READY</span>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@ export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelP
 
       <div className="flex-1 overflow-hidden flex flex-col">
         <div className="px-5 py-4 flex items-center justify-between">
-           <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Optimization Guide</h3>
+           <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">G.E.O & SEO Guide</h3>
            {isLoading && <div className="animate-spin h-3 w-3 border-2 border-primary border-t-transparent rounded-full"></div>}
         </div>
         
@@ -68,9 +68,9 @@ export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelP
           <div className="px-5 pb-8 space-y-6">
             <div className="grid grid-cols-2 gap-2">
               <MetricBox label="Word Count" value={metrics.wordCount} icon={<Type className="h-3 w-3" />} />
-              <MetricBox label="Keyword Intensity" value={`${metrics.keywordDensity}%`} icon={<Search className="h-3 w-3" />} />
-              <MetricBox label="Structures" value={metrics.headingCount} icon={<BarChart3 className="h-3 w-3" />} />
-              <MetricBox label="Grade" value={metrics.readability} icon={<TrendingUp className="h-3 w-3" />} />
+              <MetricBox label="AI Citability" value={`${metrics.keywordDensity}%`} icon={<Search className="h-3 w-3" />} />
+              <MetricBox label="Logic Flow" value={metrics.headingCount} icon={<BarChart3 className="h-3 w-3" />} />
+              <MetricBox label="Reading Grade" value={metrics.readability} icon={<TrendingUp className="h-3 w-3" />} />
             </div>
 
             {suggestions ? (
@@ -78,7 +78,7 @@ export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelP
                 <div className="p-4 rounded-xl bg-slate-900 text-white space-y-2">
                   <div className="flex items-center gap-2">
                     <Zap className="h-3.5 w-3.5 text-primary" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">AI Assessment</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">AI Forge Insight</span>
                   </div>
                   <p className="text-xs leading-relaxed font-medium">
                     {suggestions.overallAssessment}
@@ -87,25 +87,25 @@ export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelP
 
                 <Accordion type="multiple" className="w-full">
                   <SuggestionGroup 
-                    title="E.E.A.T Strategy" 
-                    items={suggestions.suggestions.eEAT} 
-                    icon={<Sparkles className="h-3.5 w-3.5 text-primary" />} 
-                    value="eeat"
-                  />
-                  <SuggestionGroup 
-                    title="G.E.O Localization" 
+                    title="G.E.O Strategy (AI Search)" 
                     items={suggestions.suggestions.gEO} 
-                    icon={<MapPin className="h-3.5 w-3.5 text-accent" />} 
+                    icon={<BrainCircuit className="h-3.5 w-3.5 text-primary" />} 
                     value="geo"
                   />
                   <SuggestionGroup 
-                    title="Keyword Optimization" 
+                    title="E.E.A.T Credibility" 
+                    items={suggestions.suggestions.eEAT} 
+                    icon={<Sparkles className="h-3.5 w-3.5 text-accent" />} 
+                    value="eeat"
+                  />
+                  <SuggestionGroup 
+                    title="Semantic Keywords" 
                     items={suggestions.suggestions.keywordDensity} 
                     icon={<Search className="h-3.5 w-3.5 text-blue-500" />} 
                     value="keywords"
                   />
                   <SuggestionGroup 
-                    title="Link Integrity" 
+                    title="Authority Links" 
                     items={[...suggestions.suggestions.internalLinking, ...suggestions.suggestions.externalLinking]} 
                     icon={<LinkIcon className="h-3.5 w-3.5 text-slate-400" />} 
                     value="links"
@@ -115,7 +115,7 @@ export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelP
             ) : !isLoading && content.length > 50 ? (
                <div className="py-12 text-center space-y-3 opacity-50">
                   <BarChart3 className="h-8 w-8 mx-auto text-slate-200" />
-                  <p className="text-xs font-medium text-slate-400">Analysis will update as you forge...</p>
+                  <p className="text-xs font-medium text-slate-400">Analyzing G.E.O metrics...</p>
                </div>
             ) : null}
           </div>

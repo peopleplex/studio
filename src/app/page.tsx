@@ -13,7 +13,6 @@ import {
   Sparkles, 
   Save, 
   Download, 
-  Send, 
   Trash2, 
   ListChecks, 
   Type, 
@@ -23,12 +22,13 @@ import {
   ShieldCheck, 
   Zap, 
   Search,
-  Settings2,
   Hammer,
   FileEdit,
   Eraser,
   Building2,
-  Hash
+  Hash,
+  BrainCircuit,
+  Info
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -40,9 +40,9 @@ export default function RankForgeEditor() {
   // Article State
   const [topic, setTopic] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [companyDescription, setCompanyDescription] = useState('');
   const [keywords, setKeywords] = useState('');
-  const [audience, setAudience] = useState('');
-  const [location, setLocation] = useState('');
+  const [geoOptimization, setGeoOptimization] = useState('SearchGPT, Google SGE');
   const [targetWordCount, setTargetWordCount] = useState('1000');
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
@@ -79,8 +79,7 @@ export default function RankForgeEditor() {
           const result = await getSeoOptimizationSuggestions({
             articleContent: content,
             targetKeywords: keywordList,
-            targetAudience: audience || 'General Public',
-            targetLocation: location || undefined,
+            geoOptimization: geoOptimization || undefined,
           });
           setSuggestions(result);
         } catch (error) {
@@ -92,7 +91,7 @@ export default function RankForgeEditor() {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [content, keywords, audience, location]);
+  }, [content, keywords, geoOptimization]);
 
   const handleGenerate = async (format: 'article' | 'outline') => {
     if (!topic || !keywords) {
@@ -109,10 +108,11 @@ export default function RankForgeEditor() {
       const result = await generateSeoDraftArticle({
         topic,
         companyName,
+        companyDescription,
         keywords: keywordList,
-        audienceInsights: audience || 'General audience looking for professional information.',
         outputFormat: format,
         targetWordCount: parseInt(targetWordCount) || undefined,
+        geoOptimization: geoOptimization,
       });
       
       setContent(result.content);
@@ -122,13 +122,13 @@ export default function RankForgeEditor() {
       
       toast({
         title: 'Content Forged',
-        description: `Your ${format} has been successfully generated using E.E.A.T principles.`,
+        description: `Your ${format} has been generated with AI-driven audience targeting and G.E.O strategies.`,
       });
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Forge Error',
-        description: 'Failed to generate content. Please check your connection and try again.',
+        description: 'Failed to generate content. Please check your connection.',
       });
     } finally {
       setIsGenerating(false);
@@ -212,7 +212,9 @@ export default function RankForgeEditor() {
                         value={topic}
                         onChange={(e) => setTopic(e.target.value)}
                       />
+                      <p className="text-[9px] text-slate-400 italic">Target audience will be discovered by AI based on this topic.</p>
                     </div>
+
                     <div className="space-y-2">
                       <Label htmlFor="company" className="text-xs font-bold text-slate-500 uppercase">Company Name</Label>
                       <div className="relative">
@@ -226,6 +228,18 @@ export default function RankForgeEditor() {
                         />
                       </div>
                     </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="description" className="text-xs font-bold text-slate-500 uppercase">Company Description</Label>
+                      <Textarea 
+                        id="description" 
+                        placeholder="Brief overview of what you do..." 
+                        className="bg-slate-50/50 min-h-[80px] resize-none text-sm"
+                        value={companyDescription}
+                        onChange={(e) => setCompanyDescription(e.target.value)}
+                      />
+                    </div>
+
                     <div className="space-y-2">
                       <Label htmlFor="keywords" className="text-xs font-bold text-slate-500 uppercase">Target Keywords</Label>
                       <Textarea 
@@ -235,34 +249,29 @@ export default function RankForgeEditor() {
                         value={keywords}
                         onChange={(e) => setKeywords(e.target.value)}
                       />
-                      <p className="text-[10px] text-slate-400">Separate keywords with commas for best analysis.</p>
+                      <p className="text-[10px] text-slate-400">Separate keywords with commas.</p>
                     </div>
                   </div>
 
                   <div className="pt-4 border-t space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="audience" className="text-xs font-bold text-slate-500 uppercase">Target Audience</Label>
-                      <Input 
-                        id="audience" 
-                        placeholder="e.g. Tech Professionals" 
-                        className="bg-slate-50/50 h-8 text-sm"
-                        value={audience}
-                        onChange={(e) => setAudience(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="location" className="text-xs font-bold text-slate-500 uppercase">G.E.O Focus</Label>
+                      <Label htmlFor="geo" className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1.5">
+                        G.E.O Focus 
+                        <Info className="h-3 w-3 text-slate-400" />
+                      </Label>
                       <div className="relative">
-                        <Globe className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                        <BrainCircuit className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-primary" />
                         <Input 
-                          id="location" 
-                          placeholder="Global / Specific Region" 
+                          id="geo" 
+                          placeholder="SearchGPT, Google SGE, Perplexity..." 
                           className="bg-slate-50/50 pl-8 h-8 text-sm"
-                          value={location}
-                          onChange={(e) => setLocation(e.target.value)}
+                          value={geoOptimization}
+                          onChange={(e) => setGeoOptimization(e.target.value)}
                         />
                       </div>
+                      <p className="text-[9px] text-slate-400 leading-tight">Optimizing for AI Generative Search Engines (SearchGPT/Google Overview).</p>
                     </div>
+
                     <div className="space-y-2">
                       <Label htmlFor="wordcount" className="text-xs font-bold text-slate-500 uppercase">Number of Words</Label>
                       <div className="relative">
@@ -291,7 +300,7 @@ export default function RankForgeEditor() {
                       Content Forge
                     </div>
                     <p className="text-xs text-slate-500 leading-relaxed">
-                      Generate high-ranking content using built-in E.E.A.T and G.E.O intelligence.
+                      Generate content optimized for AI visibility and traditional SEO rankings.
                     </p>
                     <div className="space-y-2 pt-2">
                       <Button 
@@ -311,26 +320,6 @@ export default function RankForgeEditor() {
                       </Button>
                     </div>
                   </div>
-
-                  <div className="space-y-4">
-                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Optimization Modules</h3>
-                    <div className="grid gap-2">
-                      <div className="flex items-center justify-between p-3 rounded-lg border bg-white hover:border-primary/30 transition-colors cursor-pointer group">
-                        <div className="flex items-center gap-3">
-                          <ShieldCheck className="h-4 w-4 text-accent" />
-                          <span className="text-xs font-medium">E.E.A.T Validator</span>
-                        </div>
-                        <Zap className="h-3 w-3 text-slate-300 group-hover:text-primary" />
-                      </div>
-                      <div className="flex items-center justify-between p-3 rounded-lg border bg-white hover:border-primary/30 transition-colors cursor-pointer group">
-                        <div className="flex items-center gap-3">
-                          <Target className="h-4 w-4 text-primary" />
-                          <span className="text-xs font-medium">Search Intent Match</span>
-                        </div>
-                        <Zap className="h-3 w-3 text-slate-300 group-hover:text-primary" />
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </ScrollArea>
             </TabsContent>
@@ -340,7 +329,7 @@ export default function RankForgeEditor() {
         {/* Main Workspace */}
         <main className="flex-1 bg-[#F1F5F9] relative flex flex-col p-6 overflow-hidden">
           <div className="flex-1 max-w-5xl mx-auto w-full bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col relative">
-            <div className="h-10 border-b bg-slate-50/50 flex items-center px-4 gap-4 overflow-x-auto shrink-0 scrollbar-hide">
+            <div className="h-10 border-b bg-slate-50/50 flex items-center px-4 gap-4 shrink-0 overflow-x-auto scrollbar-hide">
               <div className="flex gap-1">
                  <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
@@ -365,7 +354,7 @@ export default function RankForgeEditor() {
                   </div>
                   <div className="space-y-1">
                     <h2 className="text-xl font-bold text-slate-800">Your Forge is Ready</h2>
-                    <p className="text-sm text-slate-400 max-w-[260px] mx-auto">Start typing manually or use AI Tools on the left to ignite your first draft.</p>
+                    <p className="text-sm text-slate-400 max-w-[260px] mx-auto">Input your parameters to ignite the Content Forge.</p>
                   </div>
                 </div>
               )}
@@ -385,7 +374,6 @@ export default function RankForgeEditor() {
                       <span className="w-1 h-1 rounded-full bg-primary animate-bounce delay-75"></span>
                       <span className="w-1 h-1 rounded-full bg-primary animate-bounce delay-150"></span>
                     </div>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-4">Applying Ranking Principles</p>
                   </div>
                 </div>
               )}
@@ -409,7 +397,7 @@ export default function RankForgeEditor() {
              </div>
              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                Workspace Sync Active
+                G.E.O Precision Mode Active
              </div>
           </div>
         </main>
