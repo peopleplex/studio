@@ -311,17 +311,21 @@ export default function RankForgeEditor() {
 
                     <div className="space-y-2">
                       <Label htmlFor="wordcount" className="text-xs font-bold text-slate-500 uppercase">Number of Words</Label>
-                      <div className="relative">
-                        <Hash className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
-                        <Input 
-                          id="wordcount" 
-                          type="number"
-                          placeholder="e.g. 1500" 
-                          className="bg-slate-50/50 pl-8 h-8 text-sm"
-                          value={targetWordCount}
-                          onChange={(e) => setTargetWordCount(e.target.value)}
-                        />
-                      </div>
+                      <Select value={targetWordCount} onValueChange={setTargetWordCount}>
+                        <SelectTrigger className="bg-slate-50/50 h-8 text-sm">
+                          <Hash className="h-3.5 w-3.5 text-slate-400 mr-2" />
+                          <SelectValue placeholder="Select length" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="500">~500 words</SelectItem>
+                          <SelectItem value="800">~800 words</SelectItem>
+                          <SelectItem value="1000">~1000 words (Standard)</SelectItem>
+                          <SelectItem value="1200">~1200 words</SelectItem>
+                          <SelectItem value="1500">~1500 words</SelectItem>
+                          <SelectItem value="2000">~2000 words</SelectItem>
+                          <SelectItem value="2500">~2500 words</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>
