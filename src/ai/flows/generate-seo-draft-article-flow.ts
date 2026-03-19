@@ -54,10 +54,12 @@ const prompt = ai.definePrompt({
   input: {schema: InternalPromptInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
   config: {
-    maxOutputTokens: 6000, // Significantly increased to handle long articles without truncation
+    maxOutputTokens: 8192, // Maximized output to prevent truncation
     temperature: 0.7,
   },
   prompt: `You are a professional AI content writer specializing in SEO, E.E.A.T (Expertise, Authoritativeness, Trustworthiness), and G.E.O (Generative Engine Optimization) principles. Your goal is to generate high-quality content that ranks well on traditional search engines and is optimized for AI-driven search (e.g., SearchGPT, Google SGE, Perplexity).
+
+CRITICAL INSTRUCTION: You MUST complete the entire article or outline. Do NOT stop mid-sentence. Ensure the content flows logically to a definitive conclusion or summary.
 
 IMPORTANT: Use proper Markdown formatting. Ensure there are AT LEAST TWO newlines between every header, paragraph, and list item to ensure proper structure.
 
@@ -93,6 +95,7 @@ Generate a full, detailed article following these guidelines:
 - Provide expert-level information to demonstrate E.E.A.T.
 {{#if targetWordCount}}- Aim for a length close to {{{targetWordCount}}} words.{{else}}- Aim for a comprehensive length (1000+ words).{{/if}}
 - Ensure the overall tone is strictly {{{tone}}}.
+- ALWAYS end with a clear conclusion section.
 - Use markdown formatting.
 {{/if}}
 

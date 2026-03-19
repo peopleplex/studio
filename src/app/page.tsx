@@ -111,7 +111,7 @@ export default function RankForgeEditor() {
     }
 
     setIsGenerating(true);
-    setIsPreview(false); // Switch to editor view when generating
+    setIsPreview(false); // Ensure editor view during generation
     try {
       const result = await generateSeoDraftArticle({
         topic,
@@ -125,13 +125,15 @@ export default function RankForgeEditor() {
       });
       
       setContent(result.content);
+      setIsPreview(true); // Automatically switch to Preview mode after completion
+      
       const titleMatch = result.content.match(/^# (.*)/);
       if (titleMatch) setTitle(titleMatch[1]);
       else setTitle(topic);
       
       toast({
         title: 'Content Forged',
-        description: `Your ${format} has been generated with a ${tone} tone and G.E.O strategies.`,
+        description: `Your ${format} is complete. Switched to Preview mode for readability.`,
       });
     } catch (error) {
       toast({
