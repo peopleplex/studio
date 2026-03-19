@@ -65,23 +65,7 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
     outputSchema: GetSeoOptimizationSuggestionsOutputSchema,
   },
   async (input) => {
-    try {
-      // Primary Attempt: Gemini
-      const { output } = await getSeoOptimizationSuggestionsPrompt(input);
-      return output!;
-    } catch (geminiError: any) {
-      console.warn('Gemini analysis error, attempting Grok fallback:', geminiError.message);
-      
-      try {
-        // Fallback Attempt: Grok AI
-        const { output } = await getSeoOptimizationSuggestionsPrompt(input, {
-          model: 'openai/grok-beta',
-        });
-        return output!;
-      } catch (fallbackError: any) {
-        console.error('All AI analysis providers failed:', fallbackError.message);
-        throw fallbackError;
-      }
-    }
+    const { output } = await getSeoOptimizationSuggestionsPrompt(input);
+    return output!;
   }
 );
