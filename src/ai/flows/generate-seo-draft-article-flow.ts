@@ -130,12 +130,12 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
       const {output} = await prompt(promptInput);
       return output!;
     } catch (error: any) {
-      // Check if quota exceeded or 429 error
       const errorMsg = error.message?.toLowerCase() || '';
-      if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('limit')) {
-        console.warn('Primary model quota reached. Falling back to Gemini 1.5 Flash.');
-        // Fallback attempt with Gemini 1.5 Flash
-        const {output} = await prompt(promptInput, { model: 'googleai/gemini-1.5-flash' });
+      // Fallback if quota reached OR model not found (common in restricted API environments)
+      if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('limit') || errorMsg.includes('404')) {
+        console.warn('Primary model issue. Falling back to Gemini 1.5 Pro for higher compatibility.');
+        // Fallback attempt with Gemini 1.5 Pro which is often more universally available
+        const {output} = await prompt(promptInput, { model: 'googleai/gemini-1.5-pro' });
         return output!;
       }
       throw error;
