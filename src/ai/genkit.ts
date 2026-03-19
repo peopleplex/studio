@@ -1,15 +1,19 @@
 
-import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
-import {openAI} from 'genkitx-openai';
+import { genkit } from 'genkit';
+import { googleAI } from '@genkit-ai/google-genai';
+import { openai } from 'genkitx-openai';
 
+/**
+ * Genkit instance configured with Google AI (Gemini 3.1 Flash Lite) 
+ * and OpenAI-compatible plugin for Grok fallback.
+ */
 export const ai = genkit({
   plugins: [
     googleAI(),
-    openAI({
+    openai({
       apiKey: process.env.GROK_API_KEY,
       baseURL: 'https://api.x.ai/v1',
     }),
   ],
-  model: 'googleai/gemini-2.0-flash',
+  model: 'googleai/gemini-3.1-flash-lite',
 });
