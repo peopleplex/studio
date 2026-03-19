@@ -30,7 +30,8 @@ import {
   BrainCircuit,
   Info,
   Copy,
-  MessagesSquare
+  MessagesSquare,
+  ChevronDown
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -222,7 +223,7 @@ export default function RankForgeEditor() {
             <TabsContent value="parameters" className="flex-1 overflow-hidden m-0">
               <ScrollArea className="h-full">
                 <div className="p-5 space-y-6">
-                  <div className="space-y-4">
+                  <div className="space-y-4 pb-12">
                     <div className="space-y-2">
                       <Label htmlFor="topic" className="text-xs font-bold text-slate-500 uppercase">Primary Topic</Label>
                       <Input 
@@ -288,9 +289,7 @@ export default function RankForgeEditor() {
                       />
                       <p className="text-[10px] text-slate-400">Separate keywords with commas.</p>
                     </div>
-                  </div>
 
-                  <div className="pt-4 border-t space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="geo" className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1.5">
                         G.E.O Focus 
