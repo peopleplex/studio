@@ -53,7 +53,9 @@ const prompt = ai.definePrompt({
   name: 'generateSeoDraftArticlePrompt',
   input: {schema: InternalPromptInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
-  prompt: `You are a professional AI content writer specializing in SEO, E.E.A.T (Expertise, Authoritativeness, Trustworthiness), and G.E.O. (Generative Engine Optimization) principles. Your goal is to generate high-quality content that ranks well on traditional search engines and is optimized for AI-driven search (e.g., SearchGPT, Google SGE, Perplexity).
+  prompt: `You are a professional AI content writer specializing in SEO, E.E.A.T (Expertise, Authoritativeness, Trustworthiness), and G.E.O (Generative Engine Optimization) principles. Your goal is to generate high-quality content that ranks well on traditional search engines and is optimized for AI-driven search (e.g., SearchGPT, Google SGE, Perplexity).
+
+IMPORTANT: Use proper Markdown formatting. Ensure there are AT LEAST TWO newlines between every header, paragraph, and list item to ensure proper structure.
 
 Based on the following information, please generate a {{outputFormat}} that is SEO-optimized and incorporates the provided keywords naturally.
 
@@ -79,9 +81,9 @@ For G.E.O (Generative Engine Optimization):
 
 {{#if isArticle}}
 Generate a full, detailed article following these guidelines:
-- Include a compelling title.
+- Include a compelling title as an H1 (# Title).
 - Start with an engaging introduction that hooks the reader and summarizes the value.
-- Break down the article into logical sections with clear headings (H1, H2, H3).
+- Break down the article into logical sections with clear headings (H2, H3).
 - Integrate keywords naturally.
 {{#if companyName}}- Mention {{{companyName}}} strategically to build brand authority.{{/if}}
 - Provide expert-level information to demonstrate E.E.A.T.
@@ -92,8 +94,8 @@ Generate a full, detailed article following these guidelines:
 
 {{#if isOutline}}
 Generate a detailed outline for an article:
-- Include a proposed title.
-- Structure with clear headings (H1, H2, H3) that logically flow.
+- Include a proposed title as an H1 (# Title).
+- Structure with clear headings (H2, H3) that logically flow.
 - Briefly describe key points for each section and where to integrate G.E.O strategies.
 {{#if companyName}}- Indicate strategic placements for company mentions.{{/if}}
 - Reflect the {{{tone}}} tone in the suggested content points.

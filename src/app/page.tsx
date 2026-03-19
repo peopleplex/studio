@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -16,6 +18,7 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 import { 
   Sparkles, 
   ListChecks, 
@@ -30,7 +33,9 @@ import {
   BrainCircuit,
   Info,
   Copy,
-  MessagesSquare
+  MessagesSquare,
+  Eye,
+  PenLine
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -52,6 +57,7 @@ export default function RankForgeEditor() {
   // App State
   const [isGenerating, setIsGenerating] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isPreview, setIsPreview] = useState(false);
   const [metrics, setMetrics] = useState<SeoMetrics>({
     score: 0,
     wordCount: 0,
@@ -105,6 +111,7 @@ export default function RankForgeEditor() {
     }
 
     setIsGenerating(true);
+    setIsPreview(false); // Switch to editor view when generating
     try {
       const result = await generateSeoDraftArticle({
         topic,
@@ -364,20 +371,40 @@ export default function RankForgeEditor() {
         {/* Main Workspace */}
         <main className="flex-1 bg-[#F1F5F9] relative flex flex-col p-6 overflow-hidden">
           <div className="flex-1 max-w-5xl mx-auto w-full bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col relative">
-            <div className="h-10 border-b bg-slate-50/50 flex items-center px-4 gap-4 shrink-0 overflow-x-auto scrollbar-hide">
-              <div className="flex gap-1">
-                 <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
-                 <div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
-                 <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
-              </div>
-              <div className="h-4 w-px bg-slate-200"></div>
+            <div className="h-10 border-b bg-slate-50/50 flex items-center px-4 justify-between shrink-0">
               <div className="flex items-center gap-4">
-                <Badge variant="secondary" className="text-[9px] bg-slate-200 text-slate-600 border-none font-bold uppercase">Markdown</Badge>
-                <div className="flex gap-2">
-                  <button className="p-1 hover:bg-slate-200 rounded transition-colors"><Type className="h-3.5 w-3.5 text-slate-500" /></button>
-                  <button className="p-1 hover:bg-slate-200 rounded transition-colors"><ListChecks className="h-3.5 w-3.5 text-slate-500" /></button>
-                  <button className="p-1 hover:bg-slate-200 rounded transition-colors"><FileEdit className="h-3.5 w-3.5 text-slate-500" /></button>
+                <div className="flex gap-1">
+                   <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                   <div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+                   <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
                 </div>
+                <div className="h-4 w-px bg-slate-200"></div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-[9px] bg-slate-200 text-slate-600 border-none font-bold uppercase">
+                    {isPreview ? 'Previewing' : 'Markdown'}
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+                <button 
+                  onClick={() => setIsPreview(false)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all",
+                    !isPreview ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600"
+                  )}
+                >
+                  <PenLine className="h-3 w-3" /> Edit
+                </button>
+                <button 
+                  onClick={() => setIsPreview(true)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all",
+                    isPreview ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600"
+                  )}
+                >
+                  <Eye className="h-3 w-3" /> Preview
+                </button>
               </div>
             </div>
 
@@ -414,12 +441,18 @@ export default function RankForgeEditor() {
               )}
 
               {!isGenerating && content.length > 0 && (
-                <Textarea 
-                  className="w-full border-none resize-none p-0 text-lg leading-relaxed focus-visible:ring-0 min-h-full font-body scrollbar-hide placeholder:text-slate-200"
-                  placeholder="The story begins here..."
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                />
+                isPreview ? (
+                  <div className="prose prose-slate max-w-none prose-headings:font-headline prose-h1:text-4xl prose-h1:font-black prose-h1:tracking-tight prose-h1:text-slate-900 prose-h2:text-2xl prose-h2:font-bold prose-h2:mt-12 prose-h2:mb-4 prose-p:text-lg prose-p:leading-relaxed prose-p:text-slate-600 prose-strong:text-slate-900 prose-ul:list-disc prose-li:text-slate-600 prose-li:my-2">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <Textarea 
+                    className="w-full border-none resize-none p-0 text-lg leading-relaxed focus-visible:ring-0 min-h-full font-body scrollbar-hide placeholder:text-slate-200"
+                    placeholder="The story begins here..."
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
+                )
               )}
             </div>
           </div>
