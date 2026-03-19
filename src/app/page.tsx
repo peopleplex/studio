@@ -78,34 +78,33 @@ export default function RankForgeEditor() {
     setMetrics(calculated);
   }, [content, keywords]);
 
-  const handleAnalyze = async () => {
-    if (content.length < 50) {
-      toast({
-        variant: 'destructive',
-        title: 'Content Too Short',
-        description: 'Please write or generate at least 50 words to analyze SEO quality.',
-      });
+  const handleAnalyze = async (manualContent?: string) => {
+    const contentToAnalyze = manualContent || content;
+    if (contentToAnalyze.length < 50) {
+      if (!manualContent) {
+        toast({
+          variant: 'destructive',
+          title: 'Content Too Short',
+          description: 'Please write or generate at least 50 words to analyze SEO quality.',
+        });
+      }
       return;
     }
 
     setIsAnalyzing(true);
     try {
       const result = await getSeoOptimizationSuggestions({
-        articleContent: content,
+        articleContent: contentToAnalyze,
         targetKeywords: keywordList,
         geoOptimization: geoOptimization || undefined,
       });
       setSuggestions(result);
-      toast({
-        title: 'Analysis Complete',
-        description: 'Forge Intelligence has updated your SEO and G.E.O suggestions.',
-      });
     } catch (error: any) {
       console.error('Analysis failed:', error);
       toast({
         variant: 'destructive',
         title: 'Analysis Error',
-        description: error.message || 'Failed to analyze content. Please try again.',
+        description: error.message || 'Failed to analyze content.',
       });
     } finally {
       setIsAnalyzing(false);
@@ -124,6 +123,8 @@ export default function RankForgeEditor() {
 
     setIsGenerating(true);
     setIsPreview(false);
+    setSuggestions(null); // Clear old suggestions
+    
     try {
       const result = await generateSeoDraftArticle({
         topic,
@@ -145,8 +146,17 @@ export default function RankForgeEditor() {
       
       toast({
         title: 'Content Forged',
-        description: `Your ${format} is complete. Switched to Preview mode for readability.`,
+        description: `Your ${format} is complete. Running Intelligence Analysis...`,
       });
+
+      // Automatically trigger analysis on the freshly generated content
+      await handleAnalyze(result.content);
+      
+      toast({
+        title: 'Analysis Complete',
+        description: 'Forge Intelligence has updated your SEO and G.E.O suggestions.',
+      });
+
     } catch (error: any) {
       console.error('Forge Error Detail:', error);
       toast({
@@ -207,7 +217,7 @@ export default function RankForgeEditor() {
             <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium uppercase tracking-wider">
               <span className="flex items-center gap-1.5 text-slate-400">
                 <div className="h-1.5 w-1.5 rounded-full bg-slate-300"></div>
-                Ready to Analyze
+                {isAnalyzing ? 'Analyzing...' : 'Ready to Analyze'}
               </span>
               <span>&bull;</span>
               <span>{metrics.wordCount} words</span>
@@ -359,7 +369,7 @@ export default function RankForgeEditor() {
                       Content Forge
                     </div>
                     <p className="text-xs text-slate-500 leading-relaxed">
-                      Generate high-quality drafts optimized for AI search engines.
+                      Generate high-quality drafts optimized for AI search engines. Analysis runs automatically after generation.
                     </p>
                     <div className="space-y-2 pt-2">
                       <Button 
@@ -387,20 +397,17 @@ export default function RankForgeEditor() {
                       SEO Intelligence
                     </div>
                     <p className="text-xs text-slate-500 leading-relaxed">
-                      Analyze current content for E.E.A.T and G.E.O compliance.
+                      Re-analyze content after manual edits for E.E.A.T and G.E.O compliance.
                     </p>
                     <div className="pt-2">
                       <Button 
-                        onClick={handleAnalyze} 
+                        onClick={() => handleAnalyze()} 
                         disabled={isAnalyzing || content.length < 50} 
                         variant="outline"
                         className="w-full text-xs h-9 border-accent text-accent hover:bg-accent hover:text-white"
                       >
-                        {isAnalyzing ? "Analyzing..." : "Run Intelligence Analysis"}
+                        {isAnalyzing ? "Analyzing..." : "Update Intelligence Analysis"}
                       </Button>
-                      {content.length < 50 && (
-                        <p className="text-[10px] text-slate-400 mt-2 text-center italic">Requires at least 50 words to analyze.</p>
-                      )}
                     </div>
                   </div>
                 </div>
