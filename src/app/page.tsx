@@ -11,8 +11,6 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Sparkles, 
-  Save, 
-  Download, 
   Trash2, 
   ListChecks, 
   Type, 
@@ -28,13 +26,13 @@ import {
   Building2,
   Hash,
   BrainCircuit,
-  Info
+  Info,
+  Copy
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
 import { calculateSeoMetrics, type SeoMetrics } from '@/lib/seo-utils';
 import { SeoPanel } from '@/components/SeoPanel';
-import { ExportDialog } from '@/components/ExportDialog';
 
 export default function RankForgeEditor() {
   // Article State
@@ -58,7 +56,6 @@ export default function RankForgeEditor() {
     readability: 'Poor',
   });
   const [suggestions, setSuggestions] = useState<GetSeoOptimizationSuggestionsOutput | null>(null);
-  const [exportOpen, setExportOpen] = useState(false);
   const { toast } = useToast();
 
   // Keyword array conversion
@@ -142,6 +139,22 @@ export default function RankForgeEditor() {
     }
   };
 
+  const handleCopy = () => {
+    if (!content) {
+      toast({
+        variant: 'destructive',
+        title: 'Nothing to copy',
+        description: 'The editor is empty.',
+      });
+      return;
+    }
+    navigator.clipboard.writeText(content);
+    toast({
+      title: 'Copied!',
+      description: 'Content has been copied to your clipboard.',
+    });
+  };
+
   return (
     <div className="flex flex-col h-screen bg-[#F8FAFC] overflow-hidden text-slate-900">
       {/* Precision Header */}
@@ -179,11 +192,8 @@ export default function RankForgeEditor() {
             <Eraser className="h-4 w-4 mr-2" /> Clear
           </Button>
           <div className="h-4 w-px bg-slate-200 mx-2"></div>
-          <Button variant="outline" size="sm" className="bg-white" onClick={() => toast({ title: 'Saved locally' })}>
-            <Save className="h-4 w-4 mr-2" /> Save
-          </Button>
-          <Button size="sm" className="shadow-sm shadow-primary/20" onClick={() => setExportOpen(true)}>
-            <Download className="h-4 w-4 mr-2" /> Export
+          <Button variant="outline" size="sm" className="bg-white border-primary text-primary hover:bg-primary/5" onClick={handleCopy}>
+            <Copy className="h-4 w-4 mr-2" /> Copy Content
           </Button>
         </div>
       </header>
@@ -412,13 +422,6 @@ export default function RankForgeEditor() {
           />
         </aside>
       </div>
-
-      <ExportDialog 
-        open={exportOpen} 
-        onOpenChange={setExportOpen} 
-        content={content} 
-        title={title || topic} 
-      />
       
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
