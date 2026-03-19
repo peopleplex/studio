@@ -53,6 +53,10 @@ const prompt = ai.definePrompt({
   name: 'generateSeoDraftArticlePrompt',
   input: {schema: InternalPromptInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
+  config: {
+    maxOutputTokens: 6000, // Significantly increased to handle long articles without truncation
+    temperature: 0.7,
+  },
   prompt: `You are a professional AI content writer specializing in SEO, E.E.A.T (Expertise, Authoritativeness, Trustworthiness), and G.E.O (Generative Engine Optimization) principles. Your goal is to generate high-quality content that ranks well on traditional search engines and is optimized for AI-driven search (e.g., SearchGPT, Google SGE, Perplexity).
 
 IMPORTANT: Use proper Markdown formatting. Ensure there are AT LEAST TWO newlines between every header, paragraph, and list item to ensure proper structure.
