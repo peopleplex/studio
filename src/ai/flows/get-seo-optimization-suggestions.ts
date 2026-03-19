@@ -70,11 +70,11 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
       return output!;
     } catch (error: any) {
       const errorMsg = error.message?.toLowerCase() || '';
-      // Fallback if quota reached OR model not found (404)
+      // Fallback if quota reached OR model not found (429 or 404)
       if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('limit') || errorMsg.includes('404')) {
-        console.warn('Primary analysis model issue. Falling back to Gemini 1.5 Pro.');
-        // Fallback attempt with Gemini 1.5 Pro
-        const { output } = await getSeoOptimizationSuggestionsPrompt(input, { model: 'googleai/gemini-1.5-pro' });
+        console.warn('Primary analysis model issue. Falling back to Gemini 1.5 Flash (Lite version).');
+        // Fallback attempt with Gemini 1.5 Flash
+        const { output } = await getSeoOptimizationSuggestionsPrompt(input, { model: 'googleai/gemini-1.5-flash' });
         return output!;
       }
       throw error;
