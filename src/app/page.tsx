@@ -77,10 +77,10 @@ export default function RankForgeEditor() {
     setMetrics(calculated);
   }, [content, keywords]);
 
-  // AI Suggestions triggering (Debounced)
+  // AI Suggestions triggering (Debounced - Increased to 10s to save quota)
   useEffect(() => {
     const timer = setTimeout(async () => {
-      if (content.length > 100) {
+      if (content.length > 100 && !isGenerating) {
         setIsAnalyzing(true);
         try {
           const result = await getSeoOptimizationSuggestions({
@@ -95,10 +95,10 @@ export default function RankForgeEditor() {
           setIsAnalyzing(false);
         }
       }
-    }, 3000);
+    }, 10000);
 
     return () => clearTimeout(timer);
-  }, [content, keywords, geoOptimization]);
+  }, [content, keywords, geoOptimization, isGenerating]);
 
   const handleGenerate = async (format: 'article' | 'outline') => {
     if (!topic || !keywords) {
