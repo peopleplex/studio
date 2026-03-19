@@ -188,11 +188,16 @@ export default function RankForgeEditor() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={clearEditor} className="text-slate-500 hover:text-destructive">
+          <Button variant="ghost" size="sm" onClick={clearEditor} className="text-slate-500 hover:text-destructive transition-colors">
             <Eraser className="h-4 w-4 mr-2" /> Clear
           </Button>
           <div className="h-4 w-px bg-slate-200 mx-2"></div>
-          <Button variant="outline" size="sm" className="bg-white border-primary text-primary hover:bg-primary/5" onClick={handleCopy}>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="bg-white border-primary text-primary hover:bg-primary hover:text-white transition-all duration-200 font-semibold" 
+            onClick={handleCopy}
+          >
             <Copy className="h-4 w-4 mr-2" /> Copy Content
           </Button>
         </div>
