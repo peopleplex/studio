@@ -53,37 +53,38 @@ const articlePrompt = ai.definePrompt({
   output: {schema: GenerateSeoDraftArticleOutputSchema},
   config: { maxOutputTokens: 4096, temperature: 0.7 },
   prompt: `Act as a professional SEO/G.E.O Content Engineer. 
-Goal: Generate a high-quality {{outputFormat}} AND immediate SEO intelligence in ONE PASS.
+Goal: Generate high-quality content AND SEO intelligence in ONE PASS.
 
-INPUT DATA:
+INPUT:
 Topic: {{{topic}}}
 Keywords: {{#each keywords}}"{{this}}" {{/each}}
 {{#if companyName}}Brand: {{{companyName}}} ({{{companyDescription}}}){{/if}}
-Target: {{#if targetWordCount}}{{{targetWordCount}}}{{else}}1000+{{/if}} words. Tone: {{{tone}}}.
-AI Search Focus: {{{geoOptimization}}}
+Tone: {{{tone}}}
+Target length: {{#if targetWordCount}}{{{targetWordCount}}}{{else}}1000{{/if}} words.
 
-CONSTRAINTS:
-1. Content: Proper Markdown. Use TWO newlines between blocks.
-2. SEO Intelligence: Provide actionable insights in the seoAnalysis field.
-3. E.E.A.T: Demonstrate high expertise and source citability for AI search engines.
+STRICT CONSTRAINTS:
+1. WORD COUNT: The generated {{outputFormat}} MUST be as close as possible to {{{targetWordCount}}} words. If the target is high, expand on examples, case studies, and detailed technical explanations. If low, be concise and punchy. Do not ignore this limit.
+2. FORMAT: Proper Markdown. Use TWO newlines between paragraphs.
+3. INTELLIGENCE: Provide actionable SEO insights in the seoAnalysis field.
+4. E.E.A.T: Ensure high expertise and citability for AI search engines.
 
 {{#if isArticle}}
-STRUCTURE:
+ARTICLE STRUCTURE:
 - H1 Title (# Title)
 - Engaging Intro
-- Logical H2/H3 sections
+- Multiple H2/H3 sections (at least 5 major sections for articles over 1000 words)
 - Natural keyword integration
-- Clear conclusion
+- Definitive conclusion
 {{/if}}
 
 {{#if isOutline}}
-STRUCTURE:
+OUTLINE STRUCTURE:
 - H1 Title
-- Detailed section headings (H2/H3)
-- Brief bullet points per section
+- Exhaustive section headings (H2/H3)
+- Detailed bullet points for each section to reach the desired word count scope
 {{/if}}
 
-Provide final output in JSON format.`,
+Return strictly valid JSON.`,
 });
 
 const generateSeoDraftArticleFlow = ai.defineFlow(
@@ -100,7 +101,7 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
     };
 
     try {
-      // Try Gemini 2.0 Flash (Primary)
+      // Primary: Gemini 2.0 Flash
       const {output} = await articlePrompt(promptInput);
       return output!;
     } catch (error) {
