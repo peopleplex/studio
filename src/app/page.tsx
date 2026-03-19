@@ -8,17 +8,19 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Sparkles, 
-  Trash2, 
   ListChecks, 
   Type, 
   FileText, 
-  Target, 
-  Globe, 
-  ShieldCheck, 
-  Zap, 
   Search,
   Hammer,
   FileEdit,
@@ -27,7 +29,8 @@ import {
   Hash,
   BrainCircuit,
   Info,
-  Copy
+  Copy,
+  MessagesSquare
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -40,6 +43,7 @@ export default function RankForgeEditor() {
   const [companyName, setCompanyName] = useState('');
   const [companyDescription, setCompanyDescription] = useState('');
   const [keywords, setKeywords] = useState('');
+  const [tone, setTone] = useState('Professional');
   const [geoOptimization, setGeoOptimization] = useState('SearchGPT, Google SGE');
   const [targetWordCount, setTargetWordCount] = useState('1000');
   const [content, setContent] = useState('');
@@ -107,6 +111,7 @@ export default function RankForgeEditor() {
         companyName,
         companyDescription,
         keywords: keywordList,
+        tone,
         outputFormat: format,
         targetWordCount: parseInt(targetWordCount) || undefined,
         geoOptimization: geoOptimization,
@@ -119,7 +124,7 @@ export default function RankForgeEditor() {
       
       toast({
         title: 'Content Forged',
-        description: `Your ${format} has been generated with AI-driven audience targeting and G.E.O strategies.`,
+        description: `Your ${format} has been generated with a ${tone} tone and G.E.O strategies.`,
       });
     } catch (error) {
       toast({
@@ -228,6 +233,23 @@ export default function RankForgeEditor() {
                         onChange={(e) => setTopic(e.target.value)}
                       />
                       <p className="text-[9px] text-slate-400 italic">Target audience will be discovered by AI based on this topic.</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="tone" className="text-xs font-bold text-slate-500 uppercase">Tone of Voice</Label>
+                      <Select value={tone} onValueChange={setTone}>
+                        <SelectTrigger className="bg-slate-50/50">
+                          <MessagesSquare className="h-3.5 w-3.5 text-slate-400 mr-2" />
+                          <SelectValue placeholder="Select tone" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Professional">Professional</SelectItem>
+                          <SelectItem value="Conversational">Conversational</SelectItem>
+                          <SelectItem value="Authoritative">Authoritative</SelectItem>
+                          <SelectItem value="Informative">Informative</SelectItem>
+                          <SelectItem value="Creative">Creative</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div className="space-y-2">

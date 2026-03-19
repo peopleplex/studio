@@ -22,6 +22,7 @@ const GenerateSeoDraftArticleInputSchema = z.object({
   companyDescription: z.string().optional().describe('Overview of the company to establish E.E.A.T.'),
   targetWordCount: z.number().optional().describe('The target length of the article in words.'),
   geoOptimization: z.string().optional().describe('Focus for Generative Engine Optimization (e.g., SearchGPT, Google Overview).'),
+  tone: z.string().optional().describe('The desired tone of voice (e.g., Professional, Conversational).'),
 });
 export type GenerateSeoDraftArticleInput = z.infer<
   typeof GenerateSeoDraftArticleInputSchema
@@ -51,6 +52,7 @@ const prompt = ai.definePrompt({
 Based on the following information, please generate a {{outputFormat}} that is SEO-optimized and incorporates the provided keywords naturally.
 
 Topic: {{{topic}}}
+{{#if tone}}Tone of Voice: {{{tone}}}{{/if}}
 {{#if companyName}}Company Name: {{{companyName}}}{{/if}}
 {{#if companyDescription}}Company Description: {{{companyDescription}}}{{/if}}
 Target Keywords: {{#each keywords}} "{{this}}"{{#unless @last}}, {{/unless}}{{/each}}
@@ -78,6 +80,7 @@ Generate a full, detailed article following these guidelines:
 {{#if companyName}}- Mention {{{companyName}}} strategically to build brand authority.{{/if}}
 - Provide expert-level information to demonstrate E.E.A.T.
 {{#if targetWordCount}}- Aim for a length close to {{{targetWordCount}}} words.{{else}}- Aim for a comprehensive length (1000+ words).{{/if}}
+- Ensure the overall tone is strictly {{{tone}}}.
 - Use markdown formatting.
 {{else if (eq outputFormat "outline")}}
 Generate a detailed outline for an article:
@@ -85,6 +88,7 @@ Generate a detailed outline for an article:
 - Structure with clear headings (H1, H2, H3) that logically flow.
 - Briefly describe key points for each section and where to integrate G.E.O strategies.
 {{#if companyName}}- Indicate strategic placements for company mentions.{{/if}}
+- Reflect the {{{tone}}} tone in the suggested content points.
 - Use markdown formatting.
 {{/if}}
 `,
