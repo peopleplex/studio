@@ -126,20 +126,7 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
       isOutline: input.outputFormat === 'outline',
     };
 
-    try {
-      const {output} = await articlePrompt(promptInput);
-      return output!;
-    } catch (error) {
-      console.warn('Primary model (Gemini) failed, falling back to Grok AI...', error);
-      
-      // Fallback to Grok AI via OpenAI plugin
-      const { output } = await ai.generate({
-        model: 'openai/grok-beta',
-        prompt: `Act as a professional SEO writer. Topic: ${input.topic}. Tone: ${input.tone}. Format: ${input.outputFormat}. Keywords: ${input.keywords.join(', ')}. Generate a high-quality ${input.outputFormat} using Markdown. Return JSON with 'content' and 'format'.`,
-        output: { schema: GenerateSeoDraftArticleOutputSchema }
-      });
-      
-      return output!;
-    }
+    const {output} = await articlePrompt(promptInput);
+    return output!;
   }
 );
