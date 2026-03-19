@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview A Genkit flow for generating SEO-optimized draft articles or outlines.
@@ -126,20 +125,7 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
       isOutline: input.outputFormat === 'outline',
     };
 
-    try {
-      // Primary attempt with Gemini 2.0 Flash
-      const {output} = await prompt(promptInput);
-      return output!;
-    } catch (error: any) {
-      const errorMsg = error.message?.toLowerCase() || '';
-      // Fallback if quota reached OR model issue (429, 404, etc)
-      if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('limit') || errorMsg.includes('404')) {
-        console.warn('Google AI issue. Falling back to Grok AI (xAI).');
-        // Fallback attempt with Grok AI (via OpenAI plugin)
-        const {output} = await prompt(promptInput, { model: 'openai/grok-beta' });
-        return output!;
-      }
-      throw error;
-    }
+    const {output} = await prompt(promptInput);
+    return output!;
   }
 );

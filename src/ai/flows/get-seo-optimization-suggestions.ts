@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview Provides AI-driven recommendations for SEO optimization.
@@ -65,20 +64,7 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
     outputSchema: GetSeoOptimizationSuggestionsOutputSchema,
   },
   async (input) => {
-    try {
-      // Primary attempt with Gemini 2.0 Flash
-      const { output } = await getSeoOptimizationSuggestionsPrompt(input);
-      return output!;
-    } catch (error: any) {
-      const errorMsg = error.message?.toLowerCase() || '';
-      // Fallback if quota reached OR model issue (429, 404, etc)
-      if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('limit') || errorMsg.includes('404')) {
-        console.warn('Google AI Analysis issue. Falling back to Grok AI (xAI).');
-        // Fallback attempt with Grok AI
-        const { output } = await getSeoOptimizationSuggestionsPrompt(input, { model: 'openai/grok-beta' });
-        return output!;
-      }
-      throw error;
-    }
+    const { output } = await getSeoOptimizationSuggestionsPrompt(input);
+    return output!;
   }
 );
