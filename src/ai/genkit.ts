@@ -3,7 +3,7 @@ import { googleAI } from '@genkit-ai/google-genai';
 
 /**
  * Genkit instance configured for professional SEO content generation.
- * Using Gemini 2.0 Flash for high speed, cutting-edge intelligence, and stability.
+ * Using Gemini 2.5 Flash for extreme high speed, cutting-edge intelligence, and stability.
  * The API key is sourced from environment variables mapped via apphosting.yaml or .env.
  */
 export const ai = genkit({
@@ -12,5 +12,5 @@ export const ai = genkit({
       apiKey: process.env.GOOGLE_GENAI_API_KEY,
     }),
   ],
-  model: 'googleai/gemini-2.0-flash',
+  model: 'googleai/gemini-2.5-flash',
 });
