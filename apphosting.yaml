@@ -5,3 +5,7 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+  # Increased timeout for long-running AI content generation tasks
+  timeoutSeconds: 120
+  # Ensure enough memory for Genkit and content processing
+  memory: 1024Mi
