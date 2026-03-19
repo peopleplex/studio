@@ -26,7 +26,9 @@ import {
   Settings2,
   Hammer,
   FileEdit,
-  Eraser
+  Eraser,
+  Building2,
+  Hash
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -37,9 +39,11 @@ import { ExportDialog } from '@/components/ExportDialog';
 export default function RankForgeEditor() {
   // Article State
   const [topic, setTopic] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [keywords, setKeywords] = useState('');
   const [audience, setAudience] = useState('');
   const [location, setLocation] = useState('');
+  const [targetWordCount, setTargetWordCount] = useState('1000');
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   
@@ -104,9 +108,11 @@ export default function RankForgeEditor() {
     try {
       const result = await generateSeoDraftArticle({
         topic,
+        companyName,
         keywords: keywordList,
         audienceInsights: audience || 'General audience looking for professional information.',
         outputFormat: format,
+        targetWordCount: parseInt(targetWordCount) || undefined,
       });
       
       setContent(result.content);
@@ -208,6 +214,19 @@ export default function RankForgeEditor() {
                       />
                     </div>
                     <div className="space-y-2">
+                      <Label htmlFor="company" className="text-xs font-bold text-slate-500 uppercase">Company Name</Label>
+                      <div className="relative">
+                        <Building2 className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                        <Input 
+                          id="company" 
+                          placeholder="Brand or Organization" 
+                          className="bg-slate-50/50 pl-8"
+                          value={companyName}
+                          onChange={(e) => setCompanyName(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
                       <Label htmlFor="keywords" className="text-xs font-bold text-slate-500 uppercase">Target Keywords</Label>
                       <Textarea 
                         id="keywords" 
@@ -241,6 +260,20 @@ export default function RankForgeEditor() {
                           className="bg-slate-50/50 pl-8 h-8 text-sm"
                           value={location}
                           onChange={(e) => setLocation(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="wordcount" className="text-xs font-bold text-slate-500 uppercase">Number of Words</Label>
+                      <div className="relative">
+                        <Hash className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                        <Input 
+                          id="wordcount" 
+                          type="number"
+                          placeholder="e.g. 1500" 
+                          className="bg-slate-50/50 pl-8 h-8 text-sm"
+                          value={targetWordCount}
+                          onChange={(e) => setTargetWordCount(e.target.value)}
                         />
                       </div>
                     </div>

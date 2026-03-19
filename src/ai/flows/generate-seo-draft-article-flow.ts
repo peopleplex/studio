@@ -18,6 +18,8 @@ const GenerateSeoDraftArticleInputSchema = z.object({
     z.string().describe('Information about the target audience, their interests, and what they search for.'),
   outputFormat:
     z.enum(['article', 'outline']).describe("The desired output format: 'article' for a full draft, 'outline' for a structured outline."),
+  companyName: z.string().optional().describe('The name of the company or brand the content is for.'),
+  targetWordCount: z.number().optional().describe('The target length of the article in words.'),
 });
 export type GenerateSeoDraftArticleInput = z.infer<
   typeof GenerateSeoDraftArticleInputSchema
@@ -47,25 +49,29 @@ const prompt = ai.definePrompt({
 Based on the following information, please generate a {{outputFormat}} that is SEO-optimized and incorporates the provided keywords naturally. Ensure the content is structured for readability and engages the target audience.
 
 Topic: {{{topic}}}
+{{#if companyName}}Company Name: {{{companyName}}}{{/if}}
 Target Keywords: {{#each keywords}} "{{this}}"{{#unless @last}}, {{/unless}}{{/each}}
 Audience Insights: {{{audienceInsights}}}
+{{#if targetWordCount}}Desired Word Count: {{{targetWordCount}}} words{{/if}}
 
 {{#if (eq outputFormat "article")}}
 Generate a full, detailed article following these guidelines:
 - Include a compelling title.
 - Start with an engaging introduction that hooks the reader and clearly states what the article will cover.
 - Break down the article into logical sections with clear headings and subheadings (H1, H2, H3).
-- Integrate the target keywords naturally throughout the content, ensuring a good keyword density without keyword stuffing.
+- Integrate the target keywords naturally throughout the content.
+{{#if companyName}}- Mention {{{companyName}}} where appropriate and relevant to the context to build brand authority.{{/if}}
 - Provide valuable, accurate, and expert-level information to demonstrate E.E.A.T.
 - Ensure the tone and style resonate with the target audience.
 - Conclude with a strong summary and a clear call to action (if appropriate).
-- Aim for a comprehensive length, typically over 1000 words if possible, to cover the topic in depth.
+{{#if targetWordCount}}- Aim for a length close to {{{targetWordCount}}} words.{{else}}- Aim for a comprehensive length, typically over 1000 words.{{/if}}
 - Use markdown formatting for headings and lists.
 {{else if (eq outputFormat "outline")}}
 Generate a detailed outline for an article following these guidelines:
 - Include a proposed title for the article.
 - Structure the outline with clear main headings (H1) and subheadings (H2, H3) that logically flow through the topic.
 - For each section, briefly describe the key points and information to be covered, and suggest where target keywords can be naturally integrated.
+{{#if companyName}}- Indicate strategic placements where the company "{{{companyName}}}" should be highlighted.{{/if}}
 - The outline should demonstrate how E.E.A.T. and G.E.O. principles will be addressed.
 - Use markdown formatting for headings and lists.
 {{/if}}
