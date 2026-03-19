@@ -28,7 +28,6 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { 
   Sparkles, 
-  Type, 
   FileText, 
   Search,
   Hammer,
@@ -37,15 +36,12 @@ import {
   Building2,
   Hash,
   BrainCircuit,
-  Info,
   Copy,
   MessagesSquare,
   Eye,
   PenLine,
   BarChart4,
   Menu,
-  Settings2,
-  ChevronRight,
   ShieldCheck,
   AlertTriangle
 } from 'lucide-react';
@@ -79,11 +75,12 @@ export default function RankForgeEditor() {
     headingCount: 0,
     readability: 'Poor',
   });
+  
+  // Normalized suggestions state to handle both single-pass and manual analysis
   const [suggestions, setSuggestions] = useState<GetSeoOptimizationSuggestionsOutput | null>(null);
   const [plagiarismReport, setPlagiarismReport] = useState<CheckPlagiarismOutput | null>(null);
   const { toast } = useToast();
 
-  // Keyword array conversion
   const keywordList = keywords.split(',').map(k => k.trim()).filter(k => k.length > 0);
 
   // Live SEO Metrics
@@ -92,23 +89,20 @@ export default function RankForgeEditor() {
     setMetrics(calculated);
   }, [content, keywords]);
 
-  const handleAnalyze = async (manualContent?: string) => {
-    const contentToAnalyze = manualContent || content;
-    if (contentToAnalyze.length < 50) {
-      if (!manualContent) {
-        toast({
-          variant: 'destructive',
-          title: 'Content Too Short',
-          description: 'Please write or generate at least 50 words to analyze SEO quality.',
-        });
-      }
+  const handleAnalyze = async () => {
+    if (content.length < 50) {
+      toast({
+        variant: 'destructive',
+        title: 'Content Too Short',
+        description: 'Please write or generate at least 50 words to analyze SEO quality.',
+      });
       return;
     }
 
     setIsAnalyzing(true);
     try {
       const result = await getSeoOptimizationSuggestions({
-        articleContent: contentToAnalyze,
+        articleContent: content,
         targetKeywords: keywordList,
         geoOptimization: geoOptimization || undefined,
       });
@@ -162,7 +156,7 @@ export default function RankForgeEditor() {
       toast({
         variant: 'destructive',
         title: 'Input Required',
-        description: 'Please provide a topic and at least one keyword to begin forging.',
+        description: 'Please provide a topic and at least one keyword.',
       });
       return;
     }
@@ -173,6 +167,7 @@ export default function RankForgeEditor() {
     setPlagiarismReport(null);
     
     try {
+      // Single-Pass Call (Consolidated Generation + Analysis)
       const result = await generateSeoDraftArticle({
         topic,
         companyName,
@@ -190,17 +185,27 @@ export default function RankForgeEditor() {
       const titleMatch = result.content.match(/^# (.*)/);
       if (titleMatch) setTitle(titleMatch[1]);
       else setTitle(topic);
-      
-      toast({
-        title: 'Content Forged',
-        description: `Your ${format} is complete. Running Intelligence Analysis...`,
-      });
 
-      await handleAnalyze(result.content);
+      // Map single-pass SEO results to the suggestions state
+      if (result.seoAnalysis) {
+        setSuggestions({
+          overallAssessment: result.seoAnalysis.overallAssessment,
+          suggestions: {
+            eEAT: result.seoAnalysis.suggestions.eEAT,
+            gEO: result.seoAnalysis.suggestions.gEO,
+            readability: result.seoAnalysis.suggestions.readability,
+            keywordDensity: result.seoAnalysis.suggestions.keywordDensity,
+            internalLinking: result.seoAnalysis.suggestions.links,
+            externalLinking: [], // Consolidated into links
+            contentFreshness: [],
+            callToAction: [],
+          }
+        });
+      }
       
       toast({
-        title: 'Analysis Complete',
-        description: 'Forge Intelligence has updated your SEO and G.E.O suggestions.',
+        title: 'Forge Complete',
+        description: `Content and Intelligence forged in one pass. Savings active.`,
       });
 
     } catch (error: any) {
@@ -370,8 +375,9 @@ export default function RankForgeEditor() {
             <div className="p-4 rounded-xl bg-accent/5 border border-accent/10 space-y-3">
               <div className="flex items-center gap-2 text-accent font-bold text-sm">
                 <BarChart4 className="h-4 w-4" />
-                SEO Intelligence
+                Manual Intelligence
               </div>
+              <p className="text-[10px] text-slate-400 leading-tight">Use only if you've manually edited the content after forging.</p>
               <Button 
                 onClick={() => handleAnalyze()} 
                 disabled={isAnalyzing || content.length < 50} 
@@ -404,7 +410,6 @@ export default function RankForgeEditor() {
 
   return (
     <div className="flex flex-col h-screen bg-[#F8FAFC] overflow-hidden text-slate-900">
-      {/* Responsive Header */}
       <header className="h-14 border-b bg-white flex items-center justify-between px-4 lg:px-6 shrink-0 z-20">
         <div className="flex items-center gap-3 lg:gap-6">
           <div className="flex lg:hidden">
@@ -492,12 +497,10 @@ export default function RankForgeEditor() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Desktop Panel */}
         <aside className="hidden lg:flex w-[340px] border-r bg-white flex-col shrink-0">
           <LeftPanelContent />
         </aside>
 
-        {/* Main Workspace */}
         <main className="flex-1 bg-[#F1F5F9] relative flex flex-col p-3 sm:p-4 lg:p-6 overflow-hidden">
           <div className="flex-1 max-w-5xl mx-auto w-full bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col relative">
             <div className="h-10 border-b bg-slate-50/50 flex items-center px-4 justify-between shrink-0">
@@ -596,7 +599,6 @@ export default function RankForgeEditor() {
           </div>
         </main>
 
-        {/* Right Desktop Panel */}
         <aside className="hidden lg:flex w-[340px] border-l bg-white flex-col shrink-0">
           <SeoPanel 
             metrics={metrics} 
