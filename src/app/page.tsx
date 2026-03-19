@@ -30,8 +30,7 @@ import {
   BrainCircuit,
   Info,
   Copy,
-  MessagesSquare,
-  ChevronDown
+  MessagesSquare
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -183,7 +182,7 @@ export default function RankForgeEditor() {
               onChange={(e) => setTitle(e.target.value)}
             />
             <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-              <span className="flex items-center gap-1 text-accent">
+              <span className="flex items-center gap-1.5 text-accent">
                 <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse"></div>
                 Live Analysis
               </span>
@@ -212,8 +211,8 @@ export default function RankForgeEditor() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Control Panel */}
         <aside className="w-[340px] border-r bg-white flex flex-col shrink-0">
-          <Tabs defaultValue="parameters" className="w-full flex flex-col flex-1">
-            <div className="px-4 py-3 border-b">
+          <Tabs defaultValue="parameters" className="w-full flex flex-col flex-1 overflow-hidden">
+            <div className="px-4 py-3 border-b shrink-0">
               <TabsList className="grid w-full grid-cols-2 bg-slate-100/50">
                 <TabsTrigger value="parameters" className="text-xs">Forge Setup</TabsTrigger>
                 <TabsTrigger value="ai" className="text-xs">AI Tools</TabsTrigger>
@@ -222,8 +221,8 @@ export default function RankForgeEditor() {
 
             <TabsContent value="parameters" className="flex-1 overflow-hidden m-0">
               <ScrollArea className="h-full">
-                <div className="p-5 space-y-6">
-                  <div className="space-y-4 pb-12">
+                <div className="p-5 space-y-6 pb-20">
+                  <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="topic" className="text-xs font-bold text-slate-500 uppercase">Primary Topic</Label>
                       <Input 
