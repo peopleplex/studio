@@ -4,18 +4,35 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { CheckCircle2, Sparkles, MapPin, Search, Type, Link as LinkIcon, Zap, BarChart3, TrendingUp, BrainCircuit } from 'lucide-react';
+import { 
+  CheckCircle2, 
+  Sparkles, 
+  MapPin, 
+  Search, 
+  Type, 
+  Link as LinkIcon, 
+  Zap, 
+  BarChart3, 
+  TrendingUp, 
+  BrainCircuit, 
+  ShieldCheck, 
+  AlertTriangle,
+  HelpCircle
+} from 'lucide-react';
 import type { SeoMetrics } from '@/lib/seo-utils';
 import type { GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
+import type { CheckPlagiarismOutput } from '@/ai/flows/check-plagiarism-flow';
+import { cn } from '@/lib/utils';
 
 interface SeoPanelProps {
   metrics: SeoMetrics;
   suggestions: GetSeoOptimizationSuggestionsOutput | null;
+  plagiarismReport?: CheckPlagiarismOutput | null;
   isLoading: boolean;
   content: string;
 }
 
-export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelProps) {
+export function SeoPanel({ metrics, suggestions, plagiarismReport, isLoading, content }: SeoPanelProps) {
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-emerald-600';
     if (score >= 50) return 'text-blue-500';
@@ -26,6 +43,15 @@ export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelP
     if (score >= 80) return 'bg-emerald-500';
     if (score >= 50) return 'bg-primary';
     return 'bg-rose-500';
+  };
+
+  const getRiskColor = (level: string) => {
+    switch (level) {
+      case 'Low': return 'text-emerald-600 bg-emerald-50';
+      case 'Medium': return 'text-amber-600 bg-amber-50';
+      case 'High': return 'text-rose-600 bg-rose-50';
+      default: return 'text-slate-600 bg-slate-50';
+    }
   };
 
   return (
@@ -60,7 +86,7 @@ export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelP
 
       <div className="flex-1 overflow-hidden flex flex-col">
         <div className="px-5 py-4 flex items-center justify-between">
-           <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">G.E.O & SEO Guide</h3>
+           <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Intelligence Modules</h3>
            {isLoading && <div className="animate-spin h-3 w-3 border-2 border-primary border-t-transparent rounded-full"></div>}
         </div>
         
@@ -72,6 +98,41 @@ export function SeoPanel({ metrics, suggestions, isLoading, content }: SeoPanelP
               <MetricBox label="Logic Flow" value={metrics.headingCount} icon={<BarChart3 className="h-3 w-3" />} />
               <MetricBox label="Reading Grade" value={metrics.readability} icon={<TrendingUp className="h-3 w-3" />} />
             </div>
+
+            {/* Plagiarism Report Section */}
+            {plagiarismReport && (
+              <div className="space-y-3 pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5 text-slate-900" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-900">Originality Report</span>
+                  </div>
+                  <Badge className={cn("text-[9px] border-none", getRiskColor(plagiarismReport.riskLevel))}>
+                    {plagiarismReport.riskLevel} Risk
+                  </Badge>
+                </div>
+                <div className="p-3 rounded-lg bg-slate-50 border border-slate-100 text-[11px] leading-relaxed text-slate-600">
+                  {plagiarismReport.analysis}
+                </div>
+                {plagiarismReport.findings.length > 0 && (
+                  <div className="space-y-2">
+                    {plagiarismReport.findings.map((finding, idx) => (
+                      <div key={idx} className="p-3 rounded-lg border border-amber-100 bg-amber-50/50 space-y-2">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle className="h-3 w-3 mt-0.5 text-amber-500 shrink-0" />
+                          <p className="text-[10px] italic font-medium text-slate-700">"{finding.segment}"</p>
+                        </div>
+                        <p className="text-[10px] text-slate-500">{finding.reason}</p>
+                        <div className="flex items-start gap-2 pt-1 border-t border-amber-100/50">
+                          <HelpCircle className="h-3 w-3 mt-0.5 text-emerald-500 shrink-0" />
+                          <p className="text-[10px] font-bold text-emerald-700">{finding.suggestion}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {suggestions ? (
               <div className="space-y-4 pt-4 border-t border-slate-100">

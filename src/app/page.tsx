@@ -45,10 +45,13 @@ import {
   BarChart4,
   Menu,
   Settings2,
-  ChevronRight
+  ChevronRight,
+  ShieldCheck,
+  AlertTriangle
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
+import { checkPlagiarism, type CheckPlagiarismOutput } from '@/ai/flows/check-plagiarism-flow';
 import { calculateSeoMetrics, type SeoMetrics } from '@/lib/seo-utils';
 import { SeoPanel } from '@/components/SeoPanel';
 
@@ -67,6 +70,7 @@ export default function RankForgeEditor() {
   // App State
   const [isGenerating, setIsGenerating] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isCheckingPlagiarism, setIsCheckingPlagiarism] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
   const [metrics, setMetrics] = useState<SeoMetrics>({
     score: 0,
@@ -76,6 +80,7 @@ export default function RankForgeEditor() {
     readability: 'Poor',
   });
   const [suggestions, setSuggestions] = useState<GetSeoOptimizationSuggestionsOutput | null>(null);
+  const [plagiarismReport, setPlagiarismReport] = useState<CheckPlagiarismOutput | null>(null);
   const { toast } = useToast();
 
   // Keyword array conversion
@@ -120,6 +125,38 @@ export default function RankForgeEditor() {
     }
   };
 
+  const handleCheckPlagiarism = async () => {
+    if (content.length < 50) {
+      toast({
+        variant: 'destructive',
+        title: 'Content Too Short',
+        description: 'Please write or generate at least 50 words to check for plagiarism.',
+      });
+      return;
+    }
+
+    setIsCheckingPlagiarism(true);
+    try {
+      const result = await checkPlagiarism({
+        articleContent: content,
+      });
+      setPlagiarismReport(result);
+      toast({
+        title: 'Plagiarism Check Complete',
+        description: `Originality risk: ${result.riskLevel}`,
+      });
+    } catch (error: any) {
+      console.error('Plagiarism check failed:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Check Failed',
+        description: error.message || 'Failed to analyze originality.',
+      });
+    } finally {
+      setIsCheckingPlagiarism(false);
+    }
+  };
+
   const handleGenerate = async (format: 'article' | 'outline') => {
     if (!topic || !keywords) {
       toast({
@@ -133,6 +170,7 @@ export default function RankForgeEditor() {
     setIsGenerating(true);
     setIsPreview(false);
     setSuggestions(null); 
+    setPlagiarismReport(null);
     
     try {
       const result = await generateSeoDraftArticle({
@@ -182,6 +220,7 @@ export default function RankForgeEditor() {
       setContent('');
       setTitle('');
       setSuggestions(null);
+      setPlagiarismReport(null);
     }
   };
 
@@ -342,6 +381,21 @@ export default function RankForgeEditor() {
                 {isAnalyzing ? "Analyzing..." : "Update Intelligence"}
               </Button>
             </div>
+
+            <div className="p-4 rounded-xl bg-slate-100 border border-slate-200 space-y-3">
+              <div className="flex items-center gap-2 text-slate-600 font-bold text-sm">
+                <ShieldCheck className="h-4 w-4" />
+                Plagiarism Guard
+              </div>
+              <Button 
+                onClick={handleCheckPlagiarism} 
+                disabled={isCheckingPlagiarism || content.length < 50} 
+                variant="outline"
+                className="w-full text-xs h-9 bg-white"
+              >
+                {isCheckingPlagiarism ? "Checking..." : "Verify Originality"}
+              </Button>
+            </div>
           </div>
         </ScrollArea>
       </TabsContent>
@@ -406,7 +460,8 @@ export default function RankForgeEditor() {
                 <SeoPanel 
                   metrics={metrics} 
                   suggestions={suggestions} 
-                  isLoading={isAnalyzing} 
+                  plagiarismReport={plagiarismReport}
+                  isLoading={isAnalyzing || isCheckingPlagiarism} 
                   content={content}
                 />
               </SheetContent>
@@ -525,6 +580,14 @@ export default function RankForgeEditor() {
              <div className="flex gap-4 lg:gap-6 text-[9px] lg:text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                <span className="flex items-center gap-1"><FileText className="h-3 w-3 text-primary" /> {metrics.wordCount}</span>
                <span className="flex items-center gap-1"><Search className="h-3 w-3 text-accent" /> {metrics.keywordDensity}%</span>
+               {plagiarismReport && (
+                 <span className={cn(
+                   "flex items-center gap-1",
+                   plagiarismReport.riskLevel === 'Low' ? "text-emerald-500" : plagiarismReport.riskLevel === 'Medium' ? "text-amber-500" : "text-rose-500"
+                 )}>
+                   <ShieldCheck className="h-3 w-3" /> Originality: {plagiarismReport.riskLevel}
+                 </span>
+               )}
              </div>
              <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>
@@ -538,7 +601,8 @@ export default function RankForgeEditor() {
           <SeoPanel 
             metrics={metrics} 
             suggestions={suggestions} 
-            isLoading={isAnalyzing} 
+            plagiarismReport={plagiarismReport}
+            isLoading={isAnalyzing || isCheckingPlagiarism} 
             content={content}
           />
         </aside>
