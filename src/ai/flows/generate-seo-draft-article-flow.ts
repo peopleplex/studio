@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Genkit flow for generating SEO-optimized draft articles or outlines.
@@ -54,7 +55,7 @@ const prompt = ai.definePrompt({
   input: {schema: InternalPromptInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
   config: {
-    maxOutputTokens: 4096, // Capacity for ~2500 words
+    maxOutputTokens: 4096,
     temperature: 0.7,
   },
   prompt: `You are a professional AI content writer specializing in SEO, E.E.A.T (Expertise, Authoritativeness, Trustworthiness), and G.E.O (Generative Engine Optimization) principles. Your goal is to generate high-quality content that ranks well on traditional search engines and is optimized for AI-driven search (e.g., SearchGPT, Google SGE, Perplexity).
@@ -126,16 +127,16 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
     };
 
     try {
-      // Primary attempt with default model (Gemini 2.0 Flash)
+      // Primary attempt with Gemini 2.0 Flash
       const {output} = await prompt(promptInput);
       return output!;
     } catch (error: any) {
       const errorMsg = error.message?.toLowerCase() || '';
-      // Fallback if quota reached OR model not found (429 or 404)
+      // Fallback if quota reached OR model issue (429, 404, etc)
       if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('limit') || errorMsg.includes('404')) {
-        console.warn('Primary model issue. Falling back to Gemini 1.5 Flash (Lite version) for higher compatibility.');
-        // Fallback attempt with Gemini 1.5 Flash
-        const {output} = await prompt(promptInput, { model: 'googleai/gemini-1.5-flash' });
+        console.warn('Google AI issue. Falling back to Grok AI (xAI).');
+        // Fallback attempt with Grok AI (via OpenAI plugin)
+        const {output} = await prompt(promptInput, { model: 'openai/grok-beta' });
         return output!;
       }
       throw error;
