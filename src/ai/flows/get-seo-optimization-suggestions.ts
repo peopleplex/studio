@@ -64,7 +64,15 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
     outputSchema: GetSeoOptimizationSuggestionsOutputSchema,
   },
   async (input) => {
-    const { output } = await getSeoOptimizationSuggestionsPrompt(input);
-    return output!;
+    try {
+      const { output } = await getSeoOptimizationSuggestionsPrompt(input);
+      return output!;
+    } catch (error) {
+      console.warn('Primary Gemini model failed, falling back to Grok AI for analysis:', error);
+      const { output } = await getSeoOptimizationSuggestionsPrompt(input, {
+        model: 'openai/grok-beta'
+      });
+      return output!;
+    }
   }
 );

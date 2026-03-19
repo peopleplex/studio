@@ -125,7 +125,15 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
       isOutline: input.outputFormat === 'outline',
     };
 
-    const {output} = await prompt(promptInput);
-    return output!;
+    try {
+      const {output} = await prompt(promptInput);
+      return output!;
+    } catch (error) {
+      console.warn('Primary Gemini model failed, falling back to Grok AI:', error);
+      const {output} = await prompt(promptInput, {
+        model: 'openai/grok-beta'
+      });
+      return output!;
+    }
   }
 );
