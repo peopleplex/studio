@@ -54,7 +54,7 @@ const prompt = ai.definePrompt({
   input: {schema: InternalPromptInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
   config: {
-    maxOutputTokens: 4096, // Reduced to save on quota for ~2000-2500 words
+    maxOutputTokens: 4096, // Capacity for ~2500 words
     temperature: 0.7,
   },
   prompt: `You are a professional AI content writer specializing in SEO, E.E.A.T (Expertise, Authoritativeness, Trustworthiness), and G.E.O (Generative Engine Optimization) principles. Your goal is to generate high-quality content that ranks well on traditional search engines and is optimized for AI-driven search (e.g., SearchGPT, Google SGE, Perplexity).
@@ -134,8 +134,8 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
       const errorMsg = error.message?.toLowerCase() || '';
       if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('limit')) {
         console.warn('Primary model quota reached. Falling back to Gemini 1.5 Flash.');
-        // Fallback attempt with Gemini 1.5 Flash (using more robust model ID)
-        const {output} = await prompt(promptInput, { model: 'googleai/gemini-1.5-flash-latest' });
+        // Fallback attempt with Gemini 1.5 Flash
+        const {output} = await prompt(promptInput, { model: 'googleai/gemini-1.5-flash' });
         return output!;
       }
       throw error;

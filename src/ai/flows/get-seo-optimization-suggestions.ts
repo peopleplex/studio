@@ -73,8 +73,8 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
       const errorMsg = error.message?.toLowerCase() || '';
       if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('limit')) {
         console.warn('Primary analysis model quota reached. Falling back to Gemini 1.5 Flash.');
-        // Fallback attempt with Gemini 1.5 Flash (using more robust model ID)
-        const { output } = await getSeoOptimizationSuggestionsPrompt(input, { model: 'googleai/gemini-1.5-flash-latest' });
+        // Fallback attempt with Gemini 1.5 Flash
+        const { output } = await getSeoOptimizationSuggestionsPrompt(input, { model: 'googleai/gemini-1.5-flash' });
         return output!;
       }
       throw error;
