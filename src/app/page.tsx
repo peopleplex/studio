@@ -35,7 +35,8 @@ import {
   Copy,
   MessagesSquare,
   Eye,
-  PenLine
+  PenLine,
+  BarChart4
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -71,34 +72,45 @@ export default function RankForgeEditor() {
   // Keyword array conversion
   const keywordList = keywords.split(',').map(k => k.trim()).filter(k => k.length > 0);
 
-  // Live SEO Analysis
+  // Live SEO Metrics (Lightweight - no API call)
   useEffect(() => {
     const calculated = calculateSeoMetrics(content, keywordList);
     setMetrics(calculated);
   }, [content, keywords]);
 
-  // AI Suggestions triggering (Debounced - Increased to 10s to save quota)
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      if (content.length > 100 && !isGenerating) {
-        setIsAnalyzing(true);
-        try {
-          const result = await getSeoOptimizationSuggestions({
-            articleContent: content,
-            targetKeywords: keywordList,
-            geoOptimization: geoOptimization || undefined,
-          });
-          setSuggestions(result);
-        } catch (error) {
-          console.error('Analysis failed:', error);
-        } finally {
-          setIsAnalyzing(false);
-        }
-      }
-    }, 10000);
+  const handleAnalyze = async () => {
+    if (content.length < 50) {
+      toast({
+        variant: 'destructive',
+        title: 'Content Too Short',
+        description: 'Please write or generate at least 50 words to analyze SEO quality.',
+      });
+      return;
+    }
 
-    return () => clearTimeout(timer);
-  }, [content, keywords, geoOptimization, isGenerating]);
+    setIsAnalyzing(true);
+    try {
+      const result = await getSeoOptimizationSuggestions({
+        articleContent: content,
+        targetKeywords: keywordList,
+        geoOptimization: geoOptimization || undefined,
+      });
+      setSuggestions(result);
+      toast({
+        title: 'Analysis Complete',
+        description: 'Forge Intelligence has updated your SEO and G.E.O suggestions.',
+      });
+    } catch (error: any) {
+      console.error('Analysis failed:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Analysis Error',
+        description: error.message || 'Failed to analyze content. Please try again.',
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleGenerate = async (format: 'article' | 'outline') => {
     if (!topic || !keywords) {
@@ -111,7 +123,7 @@ export default function RankForgeEditor() {
     }
 
     setIsGenerating(true);
-    setIsPreview(false); // Ensure editor view during generation
+    setIsPreview(false);
     try {
       const result = await generateSeoDraftArticle({
         topic,
@@ -125,7 +137,7 @@ export default function RankForgeEditor() {
       });
       
       setContent(result.content);
-      setIsPreview(true); // Automatically switch to Preview mode after completion
+      setIsPreview(true);
       
       const titleMatch = result.content.match(/^# (.*)/);
       if (titleMatch) setTitle(titleMatch[1]);
@@ -140,7 +152,7 @@ export default function RankForgeEditor() {
       toast({
         variant: 'destructive',
         title: 'Forge Error',
-        description: error.message || 'Failed to generate content. Please check your API key or connection.',
+        description: error.message || 'Failed to generate content. Please check your connection.',
       });
     } finally {
       setIsGenerating(false);
@@ -151,6 +163,7 @@ export default function RankForgeEditor() {
     if (confirm('Are you sure you want to clear all content?')) {
       setContent('');
       setTitle('');
+      setSuggestions(null);
     }
   };
 
@@ -192,9 +205,9 @@ export default function RankForgeEditor() {
               onChange={(e) => setTitle(e.target.value)}
             />
             <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-              <span className="flex items-center gap-1.5 text-accent">
-                <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse"></div>
-                Live Analysis
+              <span className="flex items-center gap-1.5 text-slate-400">
+                <div className="h-1.5 w-1.5 rounded-full bg-slate-300"></div>
+                Ready to Analyze
               </span>
               <span>&bull;</span>
               <span>{metrics.wordCount} words</span>
@@ -339,13 +352,14 @@ export default function RankForgeEditor() {
             <TabsContent value="ai" className="flex-1 overflow-hidden m-0">
               <ScrollArea className="h-full">
                 <div className="p-5 space-y-6">
+                  {/* Generation Block */}
                   <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-3">
                     <div className="flex items-center gap-2 text-primary font-bold text-sm">
                       <Sparkles className="h-4 w-4" />
                       Content Forge
                     </div>
                     <p className="text-xs text-slate-500 leading-relaxed">
-                      Generate content optimized for AI visibility and traditional SEO rankings.
+                      Generate high-quality drafts optimized for AI search engines.
                     </p>
                     <div className="space-y-2 pt-2">
                       <Button 
@@ -363,6 +377,30 @@ export default function RankForgeEditor() {
                       >
                         Create Detailed Outline
                       </Button>
+                    </div>
+                  </div>
+
+                  {/* Analysis Block */}
+                  <div className="p-4 rounded-xl bg-accent/5 border border-accent/10 space-y-3">
+                    <div className="flex items-center gap-2 text-accent font-bold text-sm">
+                      <BarChart4 className="h-4 w-4" />
+                      SEO Intelligence
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      Analyze current content for E.E.A.T and G.E.O compliance.
+                    </p>
+                    <div className="pt-2">
+                      <Button 
+                        onClick={handleAnalyze} 
+                        disabled={isAnalyzing || content.length < 50} 
+                        variant="outline"
+                        className="w-full text-xs h-9 border-accent text-accent hover:bg-accent hover:text-white"
+                      >
+                        {isAnalyzing ? "Analyzing..." : "Run Intelligence Analysis"}
+                      </Button>
+                      {content.length < 50 && (
+                        <p className="text-[10px] text-slate-400 mt-2 text-center italic">Requires at least 50 words to analyze.</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -467,8 +505,8 @@ export default function RankForgeEditor() {
                <span className="flex items-center gap-1.5"><Search className="h-3 w-3 text-blue-500" /> {metrics.keywordDensity}% density</span>
              </div>
              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                G.E.O Precision Mode Active
+                <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>
+                Intelligence Manual Mode Active
              </div>
           </div>
         </main>
