@@ -54,7 +54,7 @@ const prompt = ai.definePrompt({
   input: {schema: InternalPromptInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
   config: {
-    maxOutputTokens: 8192, // Maximized output to prevent truncation
+    maxOutputTokens: 4096, // Balanced for ~2000-2500 words to save on quota
     temperature: 0.7,
   },
   prompt: `You are a professional AI content writer specializing in SEO, E.E.A.T (Expertise, Authoritativeness, Trustworthiness), and G.E.O (Generative Engine Optimization) principles. Your goal is to generate high-quality content that ranks well on traditional search engines and is optimized for AI-driven search (e.g., SearchGPT, Google SGE, Perplexity).
