@@ -65,7 +65,17 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
     outputSchema: GetSeoOptimizationSuggestionsOutputSchema,
   },
   async (input) => {
-    const { output } = await getSeoOptimizationSuggestionsPrompt(input);
-    return output!;
+    try {
+      // Primary: Gemini 2.0 Flash
+      const { output } = await getSeoOptimizationSuggestionsPrompt(input);
+      return output!;
+    } catch (error) {
+      console.warn('Analysis 2.0 failed, falling back to 2.5:', error);
+      // Fallback: Gemini 2.5 Flash
+      const { output } = await getSeoOptimizationSuggestionsPrompt(input, {
+        model: 'googleai/gemini-2.5-flash',
+      });
+      return output!;
+    }
   }
 );

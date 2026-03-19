@@ -126,7 +126,17 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
       isOutline: input.outputFormat === 'outline',
     };
 
-    const {output} = await articlePrompt(promptInput);
-    return output!;
+    try {
+      // Primary: Gemini 2.0 Flash
+      const {output} = await articlePrompt(promptInput);
+      return output!;
+    } catch (error) {
+      console.warn('Gemini 2.0 failed, falling back to Gemini 2.5:', error);
+      // Fallback: Gemini 2.5 Flash
+      const {output} = await articlePrompt(promptInput, {
+        model: 'googleai/gemini-2.5-flash',
+      });
+      return output!;
+    }
   }
 );
