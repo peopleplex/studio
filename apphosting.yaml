@@ -9,3 +9,7 @@ runConfig:
   timeoutSeconds: 120
   # Ensure enough memory for Genkit and content processing
   memory: 1024Mi
+  # Secrets must be explicitly mapped to environment variables to be accessible in code
+  secrets:
+    - variable: GOOGLE_GENAI_API_KEY
+      secret: GOOGLE_GENAI_API_KEY

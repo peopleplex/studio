@@ -2,9 +2,9 @@ import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 
 /**
- * Genkit instance configured for high-speed SEO content generation.
- * Using Gemini 1.5 Flash for maximum stability and speed in production.
- * Explicitly passing the API key to ensure it's picked up in the App Hosting environment.
+ * Genkit instance configured for professional SEO content generation.
+ * Using Gemini 1.5 Flash for high speed and production-grade stability.
+ * The API key is sourced from environment variables mapped via apphosting.yaml.
  */
 export const ai = genkit({
   plugins: [
