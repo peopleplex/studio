@@ -65,7 +65,20 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
     outputSchema: GetSeoOptimizationSuggestionsOutputSchema,
   },
   async (input) => {
-    const { output } = await getSeoOptimizationSuggestionsPrompt(input);
-    return output!;
+    try {
+      const { output } = await getSeoOptimizationSuggestionsPrompt(input);
+      return output!;
+    } catch (error) {
+      console.warn('Primary model (Gemini) failed for SEO analysis, falling back to Grok AI...', error);
+      
+      // Fallback to Grok AI via OpenAI plugin
+      const { output } = await ai.generate({
+        model: 'openai/grok-beta',
+        prompt: `Analyze the following article for SEO and G.E.O. Provide actionable suggestions in JSON format according to the requested schema. Article: ${input.articleContent.substring(0, 2000)}. Keywords: ${input.targetKeywords.join(', ')}.`,
+        output: { schema: GetSeoOptimizationSuggestionsOutputSchema }
+      });
+      
+      return output!;
+    }
   }
 );
