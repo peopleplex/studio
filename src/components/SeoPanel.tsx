@@ -17,7 +17,8 @@ import {
   BrainCircuit, 
   ShieldCheck, 
   AlertTriangle,
-  HelpCircle
+  HelpCircle,
+  ArrowRight
 } from 'lucide-react';
 import type { SeoMetrics } from '@/lib/seo-utils';
 import type { GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -99,7 +100,6 @@ export function SeoPanel({ metrics, suggestions, plagiarismReport, isLoading, co
               <MetricBox label="Reading Grade" value={metrics.readability} icon={<TrendingUp className="h-3 w-3" />} />
             </div>
 
-            {/* Plagiarism Report Section */}
             {plagiarismReport && (
               <div className="space-y-3 pt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between">
@@ -212,7 +212,7 @@ function SuggestionGroup({ title, items, icon, value }: { title: string; items: 
         <ul className="space-y-3">
           {items.map((item, idx) => (
             <li key={idx} className="flex gap-2.5 text-[11px] text-slate-600 leading-normal">
-              <CheckCircle2 className="h-3 w-3 mt-0.5 text-accent shrink-0" />
+              <Sparkles className="h-3 w-3 mt-0.5 text-primary shrink-0 opacity-50" />
               {item}
             </li>
           ))}
