@@ -1,8 +1,7 @@
 'use server';
 /**
- * @fileOverview Optimized Genkit flow for generating SEO-optimized articles and intelligence in a single pass.
- * Surfaces detailed error messages to the client and enforces strict word count targets.
- * Includes advanced anti-plagiarism and "AI-commonness" reduction strategies.
+ * @fileOverview Optimized Genkit flow for generating SEO-optimized articles.
+ * Enforces strict JSON output to prevent UI parsing errors.
  */
 
 import {ai} from '@/ai/genkit';
@@ -50,7 +49,11 @@ export async function generateSeoDraftArticle(input: GenerateSeoDraftArticleInpu
     return { data: result };
   } catch (err: any) {
     console.error('Flow execution error:', err);
-    return { error: err.message || 'An unexpected error occurred during content generation.' };
+    // Sanitize error message to prevent huge text blocks in the UI
+    const cleanError = err.message?.includes('Received:') 
+      ? 'The AI failed to format the response correctly. Please try again with a slightly different prompt or shorter word count.' 
+      : (err.message || 'An unexpected error occurred during content generation.');
+    return { error: cleanError };
   }
 }
 
@@ -58,67 +61,42 @@ const articlePrompt = ai.definePrompt({
   name: 'generateSeoDraftArticlePrompt',
   input: {schema: InternalPromptInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
-  config: { maxOutputTokens: 4096, temperature: 0.8 },
-  prompt: `Act as a professional SEO/G.E.O Content Engineer specializing in "Information Gain" content.
+  config: { maxOutputTokens: 4096, temperature: 0.7 },
+  prompt: `You are a specialized JSON Content API. You MUST return valid JSON matching the provided schema.
 
-STRICT ANTI-PLAGIARISM & ORIGINALITY CONSTRAINTS:
-1. NO GENERIC INTROS: Do not start with phrases like "In today's digital age," "Imagine a world where," or "SEO is a vital part of..."
-2. LEAD WITH DATA: Immediately start with the specific "Unique Insights" or data provided. If none are provided, invent a highly specific, realistic case study scenario.
-3. BURSTINESS: Use varied sentence lengths (short, punchy sentences followed by longer, explanatory ones).
-4. NO AI TROPES: Avoid "In conclusion," "Furthermore," "Additionally," and "It is important to note." Use natural transitions instead.
-5. INFORMATION GAIN: Every paragraph must provide a new insight or specific detail. Do not repeat the same point in different words.
+TASK: Generate a high-quality, SEO-optimized {{{outputFormat}}} about "{{{topic}}}".
+
+STRICT CONSTRAINTS:
+1. OUTPUT FORMAT: You must return ONLY valid JSON. Do not include markdown code blocks (no \`\`\`json).
+2. ANTI-PLAGIARISM: Do not use common AI intros. Start with unique insights. Use "Burstiness" (varied sentence lengths).
+3. INFORMATION GAIN: Every section must provide new value.
+4. WORD COUNT: Aim for approximately {{{targetWordCount}}} words.
 
 INPUT:
 Topic: {{{topic}}}
 Keywords: {{#each keywords}}"{{this}}" {{/each}}
 {{#if companyName}}Brand: {{{companyName}}} ({{{companyDescription}}}){{/if}}
 Target Audience: {{{audienceInsights}}}
-Unique Insights/Data: {{{uniqueInsights}}}
-Core Objective: {{{coreObjective}}}
+Unique Insights: {{{uniqueInsights}}}
 Tone: {{{tone}}}
-Target Word Count: {{{targetWordCount}}}
-Requested Format: {{{outputFormat}}}
-
-STRICT CONSTRAINTS:
-1. WORD COUNT: The generated content MUST be as close as possible to {{{targetWordCount}}} words.
-2. FORMAT FIELD: You MUST include the "format" field in your JSON output, and it MUST be "{{{outputFormat}}}".
-3. CONTENT STYLE: Proper Markdown. Use TWO newlines between paragraphs.
-4. INTELLIGENCE: Provide actionable SEO/G.E.O insights in the "seoAnalysis" object.
-5. E.E.A.T: Prioritize the Unique Insights/Data to build authority.
 
 {{#if isArticle}}
-ARTICLE STRUCTURE:
-- H1 Title (# Title)
-- Hook Intro (Data-driven and unique)
-- Multiple H2/H3 sections
-- Natural, invisible keyword integration
-- Definitive, actionable conclusion (avoiding "In conclusion")
+STRUCTURE: H1 Title,hook intro, multiple H2/H3 sections, conclusion.
 {{/if}}
 
 {{#if isOutline}}
-OUTLINE STRUCTURE:
-- H1 Title
-- Comprehensive section headings (H2/H3)
-- Detailed bullet points for each section that highlight the specific data to be used
+STRUCTURE: H1 Title, detailed bullet points for each section.
 {{/if}}
 
-REQUIRED JSON OUTPUT STRUCTURE:
+REQUIRED JSON STRUCTURE (Ensure ALL fields are present):
 {
   "content": "...",
   "format": "{{{outputFormat}}}",
   "seoAnalysis": {
     "overallAssessment": "...",
-    "suggestions": {
-      "eEAT": [],
-      "gEO": [],
-      "readability": [],
-      "keywordDensity": [],
-      "links": []
-    }
+    "suggestions": { "eEAT": [], "gEO": [], "readability": [], "keywordDensity": [], "links": [] }
   }
-}
-
-Return strictly valid JSON.`,
+}`,
 });
 
 const generateSeoDraftArticleFlow = ai.defineFlow(
@@ -134,19 +112,17 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
       isOutline: input.outputFormat === 'outline',
     };
 
+    const runWithModel = async (modelName: string) => {
+      const {output} = await articlePrompt(promptInput, { model: modelName as any });
+      if (!output) throw new Error('Model returned empty output');
+      return output;
+    };
+
     try {
-      // Primary attempt using Gemini 2.0 Flash
-      const {output} = await articlePrompt(promptInput, {
-        model: 'googleai/gemini-2.0-flash',
-      });
-      return output!;
+      return await runWithModel('googleai/gemini-2.0-flash');
     } catch (error) {
-      console.warn('Initial generation attempt failed, retrying with fallback:', error);
-      // Fallback attempt using Gemini 2.5 Flash
-      const {output} = await articlePrompt(promptInput, {
-        model: 'googleai/gemini-2.5-flash',
-      });
-      return output!;
+      console.warn('Primary model failed, falling back:', error);
+      return await runWithModel('googleai/gemini-2.5-flash');
     }
   }
 );
