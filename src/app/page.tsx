@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
@@ -26,13 +26,15 @@ import {
   Zap,
   Settings2,
   ChevronRight,
-  Layout
+  Layout,
+  FileDown
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
 import { checkPlagiarism, type CheckPlagiarismOutput } from '@/ai/flows/check-plagiarism-flow';
 import { calculateSeoMetrics, type SeoMetrics } from '@/lib/seo-utils';
 import { SeoPanel } from '@/components/SeoPanel';
+import { ExportDialog } from '@/components/ExportDialog';
 
 export default function RankForgeEditor() {
   // Article State
@@ -54,6 +56,7 @@ export default function RankForgeEditor() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isCheckingPlagiarism, setIsCheckingPlagiarism] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
   const [metrics, setMetrics] = useState<SeoMetrics>({
     score: 0,
     wordCount: 0,
@@ -62,6 +65,8 @@ export default function RankForgeEditor() {
     readability: 'Poor',
   });
   
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   // Normalized suggestions state
   const [suggestions, setSuggestions] = useState<GetSeoOptimizationSuggestionsOutput | null>(null);
   const [plagiarismReport, setPlagiarismReport] = useState<CheckPlagiarismOutput | null>(null);
@@ -74,6 +79,14 @@ export default function RankForgeEditor() {
     const calculated = calculateSeoMetrics(content, keywordList);
     setMetrics(calculated);
   }, [content, keywordList]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [content, isPreview]);
 
   const handleAnalyze = async () => {
     if (content.length < 50) {
@@ -248,14 +261,14 @@ export default function RankForgeEditor() {
   };
 
   const ParameterSidebar = () => (
-    <Tabs defaultValue="parameters" className="w-full flex flex-col h-full">
-      <TabsList className="grid w-full grid-cols-2 rounded-none bg-slate-50 border-b">
+    <Tabs defaultValue="parameters" className="w-full flex flex-col h-full overflow-hidden">
+      <TabsList className="grid w-full grid-cols-2 rounded-none bg-slate-50 border-b shrink-0">
         <TabsTrigger value="parameters">Parameters</TabsTrigger>
         <TabsTrigger value="ai">AI Tools</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="parameters" className="flex-1 overflow-y-auto m-0 p-4">
-        <div className="space-y-6">
+      <TabsContent value="parameters" className="flex-1 overflow-y-auto m-0 p-4 scrollbar-thin">
+        <div className="space-y-6 pb-20 lg:pb-8">
           <div className="space-y-4">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Targeting</h3>
             <div className="space-y-2">
@@ -285,7 +298,7 @@ export default function RankForgeEditor() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Tone</Label>
-                <select value={tone} onChange={(e) => setTone(e.target.value)} className="w-full rounded-md border border-input px-3 py-2 text-sm">
+                <select value={tone} onChange={(e) => setTone(e.target.value)} className="w-full rounded-md border border-input px-3 py-2 text-sm bg-white">
                   <option>Professional</option>
                   <option>Conversational</option>
                   <option>Technical</option>
@@ -300,21 +313,23 @@ export default function RankForgeEditor() {
         </div>
       </TabsContent>
 
-      <TabsContent value="ai" className="flex-1 p-4 space-y-4">
-        <div className="p-4 rounded-lg bg-primary/5 border border-primary/10 space-y-3">
-          <p className="text-xs font-medium text-primary flex items-center gap-2">
-            <Zap className="h-3 w-3" /> Generator
-          </p>
-          <Button onClick={() => handleGenerate('article')} disabled={isGenerating} className="w-full">Forge Article</Button>
-          <Button variant="outline" onClick={() => handleGenerate('outline')} disabled={isGenerating} className="w-full">Forge Outline</Button>
-        </div>
+      <TabsContent value="ai" className="flex-1 overflow-y-auto m-0 p-4 space-y-4 scrollbar-thin">
+        <div className="space-y-4 pb-20 lg:pb-8">
+          <div className="p-4 rounded-lg bg-primary/5 border border-primary/10 space-y-3">
+            <p className="text-xs font-medium text-primary flex items-center gap-2">
+              <Zap className="h-3 w-3" /> Generator
+            </p>
+            <Button onClick={() => handleGenerate('article')} disabled={isGenerating} className="w-full">Forge Article</Button>
+            <Button variant="outline" onClick={() => handleGenerate('outline')} disabled={isGenerating} className="w-full">Forge Outline</Button>
+          </div>
 
-        <div className="p-4 rounded-lg border space-y-3">
-          <p className="text-xs font-medium text-muted-foreground flex items-center gap-2">
-            <BarChart4 className="h-3 w-3" /> Analysis
-          </p>
-          <Button onClick={handleAnalyze} disabled={isAnalyzing || content.length < 50} variant="outline" className="w-full">Update SEO Intel</Button>
-          <Button onClick={handleCheckPlagiarism} disabled={isCheckingPlagiarism || content.length < 50} variant="outline" className="w-full">Check Originality</Button>
+          <div className="p-4 rounded-lg border bg-white space-y-3">
+            <p className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+              <BarChart4 className="h-3 w-3" /> Analysis
+            </p>
+            <Button onClick={handleAnalyze} disabled={isAnalyzing || content.length < 50} variant="outline" className="w-full">Update SEO Intel</Button>
+            <Button onClick={handleCheckPlagiarism} disabled={isCheckingPlagiarism || content.length < 50} variant="outline" className="w-full">Check Originality</Button>
+          </div>
         </div>
       </TabsContent>
     </Tabs>
@@ -348,7 +363,9 @@ export default function RankForgeEditor() {
                 <SheetHeader className="p-4 border-b">
                   <SheetTitle className="text-sm font-bold uppercase tracking-widest">Setup & Tools</SheetTitle>
                 </SheetHeader>
-                <ParameterSidebar />
+                <div className="h-[calc(100vh-64px)] overflow-hidden">
+                   <ParameterSidebar />
+                </div>
               </SheetContent>
             </Sheet>
 
@@ -362,13 +379,15 @@ export default function RankForgeEditor() {
                 <SheetHeader className="p-4 border-b">
                   <SheetTitle className="text-sm font-bold uppercase tracking-widest">SEO Insights</SheetTitle>
                 </SheetHeader>
-                <SeoPanel 
-                  metrics={metrics} 
-                  suggestions={suggestions} 
-                  plagiarismReport={plagiarismReport}
-                  isLoading={isAnalyzing || isCheckingPlagiarism} 
-                  content={content}
-                />
+                <div className="h-[calc(100vh-64px)] overflow-hidden">
+                  <SeoPanel 
+                    metrics={metrics} 
+                    suggestions={suggestions} 
+                    plagiarismReport={plagiarismReport}
+                    isLoading={isAnalyzing || isCheckingPlagiarism} 
+                    content={content}
+                  />
+                </div>
               </SheetContent>
             </Sheet>
           </div>
@@ -381,13 +400,20 @@ export default function RankForgeEditor() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
+          
           <Separator orientation="vertical" className="h-4 mx-1 hidden sm:block" />
-          <Button variant="ghost" size="icon" onClick={handleCopy} className="hidden sm:inline-flex">
-            <Copy className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={clearEditor} className="text-destructive hidden sm:inline-flex">
-            <Eraser className="h-4 w-4" />
-          </Button>
+          
+          <div className="hidden sm:flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={handleCopy} title="Copy to clipboard">
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => setIsExportOpen(true)} title="Export content">
+              <FileDown className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={clearEditor} className="text-destructive" title="Clear editor">
+              <Eraser className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -397,39 +423,61 @@ export default function RankForgeEditor() {
         </aside>
 
         <main className="flex-1 flex flex-col bg-white overflow-hidden">
-          <div className="h-12 border-b flex items-center justify-between px-6 shrink-0 bg-white z-10">
+          <div className="h-12 border-b flex items-center justify-between px-6 shrink-0 bg-white z-10 shadow-sm">
              <div className="flex items-center gap-4">
-               <button onClick={() => setIsPreview(false)} className={cn("text-sm font-medium h-full border-b-2 transition-colors", !isPreview ? "text-primary border-primary" : "text-muted-foreground border-transparent")}>Edit</button>
-               <button onClick={() => setIsPreview(true)} className={cn("text-sm font-medium h-full border-b-2 transition-colors", isPreview ? "text-primary border-primary" : "text-muted-foreground border-transparent")}>Preview</button>
+               <button 
+                 onClick={() => setIsPreview(false)} 
+                 className={cn(
+                   "text-sm font-bold h-12 border-b-2 transition-all uppercase tracking-widest flex items-center", 
+                   !isPreview ? "text-primary border-primary" : "text-muted-foreground border-transparent hover:text-primary/70"
+                 )}
+               >
+                 Draft
+               </button>
+               <button 
+                 onClick={() => setIsPreview(true)} 
+                 className={cn(
+                   "text-sm font-bold h-12 border-b-2 transition-all uppercase tracking-widest flex items-center", 
+                   isPreview ? "text-primary border-primary" : "text-muted-foreground border-transparent hover:text-primary/70"
+                 )}
+               >
+                 Preview
+               </button>
              </div>
-             <div className="flex items-center gap-4 text-[10px] md:text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                <span className="flex items-center gap-1.5"><FileText className="h-3 w-3 text-slate-400" /> {metrics.wordCount} words</span>
-                <span className="flex items-center gap-1.5"><Search className="h-3 w-3 text-slate-400" /> {metrics.keywordDensity}% density</span>
+             <div className="flex items-center gap-4 text-[10px] md:text-xs text-muted-foreground font-black uppercase tracking-wider">
+                <span className="flex items-center gap-1.5"><FileText className="h-3 w-3 text-slate-300" /> {metrics.wordCount} words</span>
+                <span className="flex items-center gap-1.5"><Search className="h-3 w-3 text-slate-300" /> {metrics.keywordDensity}% density</span>
              </div>
           </div>
 
           <ScrollArea className="flex-1">
-            <div className="p-4 md:p-8 max-w-3xl mx-auto">
+            <div className="p-6 md:p-12 max-w-3xl mx-auto min-h-full">
               {isGenerating ? (
-                <div className="h-64 flex flex-col items-center justify-center space-y-4">
+                <div className="h-[400px] flex flex-col items-center justify-center space-y-6">
                   <div className="relative">
-                    <Sparkles className="h-8 w-8 text-primary animate-pulse" />
-                    <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-ping" />
+                    <Sparkles className="h-12 w-12 text-primary animate-pulse" />
+                    <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-ping" />
                   </div>
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse">Forging high-value content...</p>
+                  <div className="text-center space-y-2">
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse">Forging High-Value Assets</p>
+                    <p className="text-xs text-muted-foreground">Synthesizing E.E.A.T principles...</p>
+                  </div>
                 </div>
               ) : isPreview ? (
-                <div className="prose prose-slate max-w-none prose-headings:font-black prose-p:leading-relaxed">
+                <div className="prose prose-slate max-w-none prose-headings:font-black prose-p:leading-relaxed prose-h1:text-4xl">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
                 </div>
               ) : (
                 <Textarea 
-                  className="w-full min-h-[600px] border-none resize-none p-0 text-base leading-relaxed focus-visible:ring-0 bg-transparent placeholder:text-slate-200"
-                  placeholder="Start writing or forge from the side panel..."
+                  ref={textareaRef}
+                  className="w-full min-h-[400px] border-none resize-none p-0 text-lg leading-relaxed focus-visible:ring-0 bg-transparent placeholder:text-slate-200 overflow-hidden"
+                  placeholder="Start engineering your content or use the forge sidebar to generate a draft..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                 />
               )}
+              {/* Add extra padding at bottom to ensure no cutoff */}
+              <div className="h-24" />
             </div>
           </ScrollArea>
         </main>
@@ -444,6 +492,13 @@ export default function RankForgeEditor() {
           />
         </aside>
       </div>
+
+      <ExportDialog 
+        open={isExportOpen} 
+        onOpenChange={setIsExportOpen} 
+        content={content} 
+        title={title || topic} 
+      />
     </div>
   );
 }
