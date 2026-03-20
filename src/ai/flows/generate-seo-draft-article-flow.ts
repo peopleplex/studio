@@ -2,6 +2,7 @@
 /**
  * @fileOverview Optimized Genkit flow for generating SEO-optimized articles and intelligence in a single pass.
  * Surfaces detailed error messages to the client and enforces strict word count targets.
+ * Includes advanced anti-plagiarism and "AI-commonness" reduction strategies.
  */
 
 import {ai} from '@/ai/genkit';
@@ -57,19 +58,15 @@ const articlePrompt = ai.definePrompt({
   name: 'generateSeoDraftArticlePrompt',
   input: {schema: InternalPromptInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
-  config: { maxOutputTokens: 4096, temperature: 0.7 },
-  prompt: `Act as a professional SEO/G.E.O Content Engineer. 
-Goal: Generate high-quality content AND SEO intelligence in ONE PASS.
+  config: { maxOutputTokens: 4096, temperature: 0.8 },
+  prompt: `Act as a professional SEO/G.E.O Content Engineer specializing in "Information Gain" content.
 
-STRICT CONSTRAINT ON WORD COUNT:
-- Your target is EXACTLY {{{targetWordCount}}} words for the content field.
-- If the target is high (e.g., 1500+ words), you MUST go into extreme detail with multiple examples, case studies, and deep explanations for every point.
-- If the target is low (e.g., 500 words), be extremely concise and punchy.
-- DO NOT finish early. Expand on the "Unique Insights" provided to reach the word count naturally.
-
-STRICT CONSTRAINT ON ORIGINALITY: 
-- DO NOT use generic AI intro tropes.
-- Lead with specific data points or the unique perspective provided in the inputs.
+STRICT ANTI-PLAGIARISM & ORIGINALITY CONSTRAINTS:
+1. NO GENERIC INTROS: Do not start with phrases like "In today's digital age," "Imagine a world where," or "SEO is a vital part of..."
+2. LEAD WITH DATA: Immediately start with the specific "Unique Insights" or data provided. If none are provided, invent a highly specific, realistic case study scenario.
+3. BURSTINESS: Use varied sentence lengths (short, punchy sentences followed by longer, explanatory ones).
+4. NO AI TROPES: Avoid "In conclusion," "Furthermore," "Additionally," and "It is important to note." Use natural transitions instead.
+5. INFORMATION GAIN: Every paragraph must provide a new insight or specific detail. Do not repeat the same point in different words.
 
 INPUT:
 Topic: {{{topic}}}
@@ -92,17 +89,17 @@ STRICT CONSTRAINTS:
 {{#if isArticle}}
 ARTICLE STRUCTURE:
 - H1 Title (# Title)
-- Hook Intro (Data-driven)
+- Hook Intro (Data-driven and unique)
 - Multiple H2/H3 sections
-- Natural keyword integration
-- Definitive conclusion
+- Natural, invisible keyword integration
+- Definitive, actionable conclusion (avoiding "In conclusion")
 {{/if}}
 
 {{#if isOutline}}
 OUTLINE STRUCTURE:
 - H1 Title
 - Comprehensive section headings (H2/H3)
-- Detailed bullet points for each section to scope out the target word count
+- Detailed bullet points for each section that highlight the specific data to be used
 {{/if}}
 
 REQUIRED JSON OUTPUT STRUCTURE:
