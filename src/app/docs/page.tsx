@@ -11,12 +11,7 @@ import {
   ShieldCheck, 
   Search, 
   Target, 
-  BrainCircuit, 
-  Lightbulb,
   CheckCircle2,
-  Info,
-  BookOpen,
-  Terminal,
   HelpCircle,
   FileSearch,
   Check
@@ -24,205 +19,111 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export default function DocumentationPage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-body pb-20">
-      {/* Navigation Header */}
+    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
       <header className="h-16 border-b bg-white flex items-center justify-between px-6 sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-primary rounded-md p-1.5 transition-transform group-hover:scale-105">
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="bg-primary rounded-md p-1.5">
               <Hammer className="h-5 w-5 text-white" />
             </div>
-            <span className="font-extrabold tracking-tight text-primary text-lg">RankForge AI</span>
+            <span className="font-bold text-primary">RankForge AI</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
-            <Link href="/" className="text-slate-400 hover:text-primary transition-colors">Editor</Link>
-            <Link href="/docs" className="text-primary border-b-2 border-primary pb-1">Methodology</Link>
+          <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
+            <Link href="/" className="text-muted-foreground hover:text-primary transition-colors">Editor</Link>
+            <Link href="/docs" className="text-primary border-b-2 border-primary pb-1">Documentation</Link>
           </nav>
         </div>
-        <Button asChild variant="outline" size="sm" className="hidden sm:flex border-primary text-primary hover:bg-primary/5">
+        <Button asChild variant="outline" size="sm">
           <Link href="/">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Editor
           </Link>
         </Button>
       </header>
 
-      <main className="max-w-5xl mx-auto py-16 px-6">
-        {/* Hero Section */}
-        <section className="space-y-6 mb-20 text-center sm:text-left">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em] mx-auto sm:mx-0">
-            <BookOpen className="h-3 w-3" /> Technical Documentation & Theory
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-black tracking-tighter text-slate-900 leading-[1.1]">
-            Content Engineering for the <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Generative Era</span>
-          </h1>
-          <p className="text-xl text-slate-500 leading-relaxed max-w-3xl">
-            RankForge AI bridges the gap between traditional search algorithms and the new wave of Large Language Model (LLM) search engines. 
+      <main className="max-w-4xl mx-auto py-12 px-6 space-y-12">
+        <section className="space-y-4">
+          <h1 className="text-4xl font-extrabold tracking-tight">How RankForge AI Works</h1>
+          <p className="text-xl text-muted-foreground leading-relaxed">
+            RankForge AI is a specialized content engineering platform designed for the era of Generative Search. 
+            We combine traditional SEO pillars with modern AI-visibility principles.
           </p>
         </section>
 
-        <div className="grid gap-20">
-          {/* Methodology: The Hybrid Approach */}
-          <section className="space-y-8">
-            <div className="flex items-center gap-3">
-              <div className="bg-slate-900 p-2 rounded-lg">
-                <Terminal className="h-5 w-5 text-white" />
-              </div>
-              <h2 className="text-3xl font-black tracking-tight">The Hybrid Methodology</h2>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="border-none shadow-xl shadow-slate-200/50 bg-white p-2">
-                <CardHeader>
-                  <CardTitle className="text-lg font-bold flex items-center gap-2">
-                    <Search className="h-5 w-5 text-blue-500" />
-                    Traditional SEO Pillar
-                  </CardTitle>
-                  <CardDescription>Optimized for Google's legacy web-crawlers.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 text-sm text-slate-600">
-                  <p>Our engine audits standard signals that still determine 70% of rankings today:</p>
-                  <ul className="space-y-2">
-                    <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" /> <strong>Keyword Density:</strong> Maintaining a 1-3% saturation to signal topical relevance without stuffing.</li>
-                    <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" /> <strong>H-Tag Hierarchy:</strong> Logical nesting of H1-H4 for clear DOM parsing.</li>
-                    <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" /> <strong>Content Depth:</strong> Monitoring word counts to ensure "Thin Content" penalties are avoided.</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card className="border-none shadow-xl shadow-slate-200/50 bg-slate-900 text-white p-2">
-                <CardHeader>
-                  <CardTitle className="text-lg font-bold flex items-center gap-2">
-                    <BrainCircuit className="h-5 w-5 text-primary" />
-                    G.E.O Framework
-                  </CardTitle>
-                  <CardDescription className="text-slate-400">Optimized for Gemini, SearchGPT, and Perplexity.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 text-sm text-slate-300">
-                  <p>Generative Engine Optimization focuses on "Summarizability" and "Citability":</p>
-                  <ul className="space-y-2">
-                    <li className="flex items-start gap-2"><Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" /> <strong>Source Citability:</strong> Using definitive claims and data points that AI models prefer to quote.</li>
-                    <li className="flex items-start gap-2"><Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" /> <strong>Semantic Connectivity:</strong> Building clusters of related concepts rather than just keyword matching.</li>
-                    <li className="flex items-start gap-2"><Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" /> <strong>Logic Flow:</strong> Ensuring the AI can extract a "Featured Snippet" easily.</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-
-          {/* Scoring Tiers */}
-          <section className="space-y-8">
-             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 p-2 rounded-lg">
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
                 <Target className="h-5 w-5 text-primary" />
-              </div>
-              <h2 className="text-3xl font-black tracking-tight">Scoring Benchmarks</h2>
-            </div>
+                Traditional SEO
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-muted-foreground">
+              <p>We analyze keyword density, heading structure, and word count to satisfy legacy web crawlers like Googlebot.</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li>Optimal Density: 1.5% - 3.0%</li>
+                <li>Clear H1-H3 Hierarchy</li>
+                <li>Minimum Authority Length: 800+ words</li>
+              </ul>
+            </CardContent>
+          </Card>
 
-            <div className="grid sm:grid-cols-3 gap-6">
-              <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
-                <div className="text-4xl font-black text-emerald-500">90+</div>
-                <h3 className="font-bold">Elite Asset</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Perfectly balanced. High probability of Page 1 rankings and being featured as a primary AI citation.</p>
-              </div>
-              <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
-                <div className="text-4xl font-black text-primary">70+</div>
-                <h3 className="font-bold">Competitive</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Strong foundation. Usually requires more "Unique Insights" or better internal link signals to cross the elite threshold.</p>
-              </div>
-              <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
-                <div className="text-4xl font-black text-rose-500">40-</div>
-                <h3 className="font-bold">Needs Refinement</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">Content is either too generic or lacks clear keyword focus. Likely to be ignored by modern search engines.</p>
-              </div>
-            </div>
-          </section>
-
-          {/* E.E.A.T Deep Dive */}
-          <section className="bg-white rounded-[3rem] p-12 border border-slate-100 shadow-xl shadow-slate-200/40 grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest">
-                <ShieldCheck className="h-3 w-3" /> The Trust Factor
-              </div>
-              <h2 className="text-4xl font-black tracking-tight">Why E.E.A.T Matters</h2>
-              <p className="text-slate-500 leading-relaxed">
-                Experience, Expertise, Authoritativeness, and Trustworthiness. Google has explicitly stated that AI-generated content is fine, <strong>only if it provides unique value</strong>. 
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                  <Lightbulb className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-bold">The "Unique Insights" Field</p>
-                    <p className="text-xs text-slate-500">Always fill this out in the Editor. It forces the AI to integrate facts it wasn't trained on, creating "Information Gain" which is a massive ranking signal.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="relative">
-               <div className="absolute -inset-4 bg-primary/5 blur-3xl rounded-full" />
-               <div className="relative p-8 rounded-3xl border-2 border-dashed border-slate-200 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center"><Check className="h-4 w-4 text-white" /></div>
-                    <span className="text-sm font-bold">Originality Check passed</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center"><Check className="h-4 w-4 text-white" /></div>
-                    <span className="text-sm font-bold">Expert data points identified</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center"><Check className="h-4 w-4 text-white" /></div>
-                    <span className="text-sm font-bold">No "AI Tropes" detected</span>
-                  </div>
-               </div>
-            </div>
-          </section>
-
-          {/* FAQ Section */}
-          <section className="space-y-8">
-            <div className="flex items-center gap-3">
-              <div className="bg-slate-100 p-2 rounded-lg">
-                <HelpCircle className="h-5 w-5 text-slate-500" />
-              </div>
-              <h2 className="text-3xl font-black tracking-tight">Frequently Asked Questions</h2>
-            </div>
-
-            <Accordion type="single" collapsible className="w-full space-y-4">
-              <AccordionItem value="item-1" className="border rounded-2xl bg-white px-6">
-                <AccordionTrigger className="text-sm font-bold py-6">Is this content safe from AI detection penalties?</AccordionTrigger>
-                <AccordionContent className="text-slate-500 pb-6">
-                  Google does not penalize AI content; it penalizes "helpful-less" content. By using our Forge with Unique Insights, you create content that sounds human because it contains information not found in standard training data. Our Originality Guard specifically audits for repetitive linguistic patterns that trigger AI detectors.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-2" className="border rounded-2xl bg-white px-6">
-                <AccordionTrigger className="text-sm font-bold py-6">What is the optimal AI Citability score?</AccordionTrigger>
-                <AccordionContent className="text-slate-500 pb-6">
-                  Aim for a "Density" score between 1.5% and 3.0%. This tells SearchGPT and Gemini that your article is focused on the core topic without being "spammy." High density mixed with good Logic Flow scores leads to better chances of being cited in the "Sources" section of an AI answer.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-3" className="border rounded-2xl bg-white px-6">
-                <AccordionTrigger className="text-sm font-bold py-6">How do I improve my Visibility Score?</AccordionTrigger>
-                <AccordionContent className="text-slate-500 pb-6">
-                  The fastest way is to follow the suggestions in the Intelligence Modules. Adding more H2/H3 headings, reaching the target word count, and including the target keywords in the first paragraph are the highest impact changes you can make.
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </section>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-accent" />
+                G.E.O Framework
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-muted-foreground">
+              <p>Generative Engine Optimization ensures your content is quoted and cited as a primary source by models like Gemini and SearchGPT.</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li>High Summarizability</li>
+                <li>Fact-dense statements</li>
+                <li>Logical data extraction points</li>
+              </ul>
+            </CardContent>
+          </Card>
         </div>
 
-        <Separator className="my-24" />
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold">Understanding Your Scores</h2>
+          <div className="space-y-4">
+            <div className="p-6 bg-white border rounded-lg flex gap-4">
+              <div className="bg-emerald-100 p-3 rounded-full h-fit">
+                <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="font-bold">Visibility Score (80+)</h3>
+                <p className="text-sm text-muted-foreground">This is your "Asset Quality" indicator. Scores above 80 mean your content has a high probability of both ranking on Page 1 and being cited in AI answers.</p>
+              </div>
+            </div>
 
-        <footer className="text-center space-y-8">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-black tracking-tight">Ready to Forge?</h2>
-            <p className="text-slate-400 font-medium">Your next ranking content is just a few parameters away.</p>
+            <div className="p-6 bg-white border rounded-lg flex gap-4">
+              <div className="bg-blue-100 p-3 rounded-full h-fit">
+                <Zap className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-bold">Originality Risk</h3>
+                <p className="text-sm text-muted-foreground">"High" risk means the content sounds too generic or matches common AI templates. "Low" risk content is unique, specific, and contains data points that AI can't easily replicate.</p>
+              </div>
+            </div>
           </div>
-          <Button asChild className="rounded-full px-10 py-7 h-auto text-xl font-bold shadow-2xl shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-1">
-            <Link href="/">Open the Forge Editor</Link>
-          </Button>
-        </footer>
+        </section>
+
+        <section className="bg-primary/5 p-8 rounded-2xl border border-primary/10">
+          <div className="flex items-center gap-2 mb-4">
+            <HelpCircle className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-bold">Pro Tip: E.E.A.T</h2>
+          </div>
+          <p className="text-sm leading-relaxed">
+            The secret to a 100/100 score is the <strong>Unique Insights</strong> field. 
+            By providing facts, personal expertise, or company-specific data that isn't in the public AI training set, 
+            you create "Information Gain"—the single strongest signal for modern search engines.
+          </p>
+        </section>
       </main>
     </div>
   );
