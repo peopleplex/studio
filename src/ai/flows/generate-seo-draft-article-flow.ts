@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview Optimized Genkit flow for generating SEO-optimized articles.
- * Enforces strict word count adherence and JSON output.
+ * Enforces strict word count adherence, Markdown formatting, and JSON output.
  */
 
 import {ai} from '@/ai/genkit';
@@ -69,13 +69,15 @@ TASK: Generate a high-quality, SEO-optimized {{{outputFormat}}} about "{{{topic}
 STRICT WORD COUNT CONSTRAINT:
 - TARGET: {{{targetWordCount}}} words.
 - CRITICAL: You MUST adhere as closely as possible to this word count. 
-- If the target is high (e.g., 1000+ words), DO NOT use fluff or repetition. Instead, provide deeper analysis, more sub-headers (H3s), detailed examples, and expanded explanations of the provided "Unique Insights".
+- If the target is high (e.g., 1000+ words), DO NOT use fluff or repetition. Instead, provide deeper analysis, more sub-headers (H3s), detailed examples, expanded explanations, and case studies to meet the length requirement.
 - If the target is low, be concise and punchy.
 
 STRICT FORMATTING CONSTRAINTS:
 1. OUTPUT: Return ONLY valid JSON.
-2. ANTI-PLAGIARISM: Do not use common AI intros like "In today's fast-paced world...". Start with the core value proposition.
-3. INFORMATION GAIN: Ensure every section adds new, specific value.
+2. SYNTAX: Use standard MARKDOWN syntax (e.g., # Title, ## Header). 
+3. NO HTML: DO NOT use HTML tags like <h1>, <p>, or <div>. Use only Markdown.
+4. ANTI-PLAGIARISM: Do not use common AI intros like "In today's fast-paced world...". Start with the core value proposition.
+5. INFORMATION GAIN: Ensure every section adds new, specific value.
 
 INPUT DATA:
 Topic: {{{topic}}}
@@ -86,11 +88,11 @@ Unique Insights: {{{uniqueInsights}}}
 Tone: {{{tone}}}
 
 {{#if isArticle}}
-STRUCTURE: H1 Title, engaging hook, multiple H2/H3 sections with deep content to meet word count, and a strategic conclusion.
+STRUCTURE: Use Markdown # for H1 Title, ## for H2, and ### for H3. Include an engaging hook, multiple detailed sections to meet the word count, and a strategic conclusion.
 {{/if}}
 
 {{#if isOutline}}
-STRUCTURE: H1 Title, extremely detailed bullet points for each section that provide enough context to write the full piece.
+STRUCTURE: Markdown # for H1 Title, followed by extremely detailed bullet points for each section that provide enough context to write the full piece.
 {{/if}}
 
 REQUIRED JSON STRUCTURE:
