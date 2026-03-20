@@ -50,8 +50,8 @@ export async function generateSeoDraftArticle(input: GenerateSeoDraftArticleInpu
   } catch (err: any) {
     console.error('Flow execution error:', err);
     // Sanitize error message to prevent huge text blocks in the UI
-    const cleanError = err.message?.includes('Received:') 
-      ? 'The AI failed to format the response correctly. Please try again with a slightly different prompt or shorter word count.' 
+    const cleanError = err.message?.includes('required property') 
+      ? 'The AI returned an incomplete response. We are retrying with a stricter protocol. Please try generating again.' 
       : (err.message || 'An unexpected error occurred during content generation.');
     return { error: cleanError };
   }
@@ -64,20 +64,22 @@ const articlePrompt = ai.definePrompt({
   config: { maxOutputTokens: 8192, temperature: 0.7 },
   prompt: `You are a specialized Content Engineering API. You MUST return valid JSON matching the provided schema.
 
+STRICT COMPLIANCE:
+- You MUST include the "format" field in the root of the JSON object. 
+- The "format" field MUST be set to "{{{outputFormat}}}".
+- You MUST include the "content" field with the full body.
+- You MUST include the "seoAnalysis" object with all sub-fields.
+
 TASK: Generate a high-quality, SEO-optimized {{{outputFormat}}} about "{{{topic}}}".
 
 STRICT WORD COUNT CONSTRAINT:
 - TARGET: {{{targetWordCount}}} words.
 - CRITICAL: You MUST adhere as closely as possible to this word count. 
-- If the target is high (e.g., 1000+ words), DO NOT use fluff or repetition. Instead, provide deeper analysis, more sub-headers (H3s), detailed examples, expanded explanations, and case studies to meet the length requirement.
-- If the target is low, be concise and punchy.
+- If the target is high (e.g., 1000+ words), DO NOT use fluff. Provide deep analysis, detailed case studies, and expanded sub-sections to reach the length.
 
-STRICT FORMATTING CONSTRAINTS:
-1. OUTPUT: Return ONLY valid JSON.
-2. SYNTAX: Use standard MARKDOWN syntax (e.g., # Title, ## Header). 
-3. NO HTML: DO NOT use HTML tags like <h1>, <p>, or <div>. Use only Markdown.
-4. ANTI-PLAGIARISM: Do not use common AI intros like "In today's fast-paced world...". Start with the core value proposition.
-5. INFORMATION GAIN: Ensure every section adds new, specific value.
+STRICT FORMATTING:
+1. NO HTML: DO NOT use <h1>, <p>, or <br> tags. Use only Markdown (#, ##, **).
+2. START STRONG: Avoid AI cliches like "In today's digital landscape". Lead with unique value.
 
 INPUT DATA:
 Topic: {{{topic}}}
@@ -88,20 +90,26 @@ Unique Insights: {{{uniqueInsights}}}
 Tone: {{{tone}}}
 
 {{#if isArticle}}
-STRUCTURE: Use Markdown # for H1 Title, ## for H2, and ### for H3. Include an engaging hook, multiple detailed sections to meet the word count, and a strategic conclusion.
+STRUCTURE: Markdown # for H1 Title, ## for H2. Include a hook, detailed sections, and a strategic conclusion.
 {{/if}}
 
 {{#if isOutline}}
-STRUCTURE: Markdown # for H1 Title, followed by extremely detailed bullet points for each section that provide enough context to write the full piece.
+STRUCTURE: Markdown # for H1, followed by detailed bullet points for each section.
 {{/if}}
 
-REQUIRED JSON STRUCTURE:
+REQUIRED JSON STRUCTURE (DO NOT OMIT ANY FIELDS):
 {
   "content": "...",
   "format": "{{{outputFormat}}}",
   "seoAnalysis": {
     "overallAssessment": "...",
-    "suggestions": { "eEAT": [], "gEO": [], "readability": [], "keywordDensity": [], "links": [] }
+    "suggestions": { 
+      "eEAT": ["suggestion 1", "suggestion 2"], 
+      "gEO": ["suggestion 1", "suggestion 2"], 
+      "readability": ["suggestion 1"], 
+      "keywordDensity": ["suggestion 1"], 
+      "links": ["suggestion 1"] 
+    }
   }
 }`,
 });
@@ -122,6 +130,12 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
     const runWithModel = async (modelName: string) => {
       const {output} = await articlePrompt(promptInput, { model: modelName as any });
       if (!output) throw new Error('Model returned empty output');
+      
+      // Final validation/patch to prevent UI errors
+      if (!output.format) {
+        output.format = input.outputFormat;
+      }
+      
       return output;
     };
 
