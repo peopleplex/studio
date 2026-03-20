@@ -252,7 +252,7 @@ export default function RankForgeEditor() {
 
   return (
     <div className="flex flex-col h-screen bg-[#F8FAFC] overflow-hidden">
-      <header className="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50">
+      <header className="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50 sticky top-0 shadow-sm">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="bg-primary rounded-md p-1.5 transition-transform group-hover:scale-105">
@@ -260,9 +260,9 @@ export default function RankForgeEditor() {
             </div>
             <span className="font-extrabold tracking-tight text-primary text-lg">RankForge AI</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-sm font-bold text-primary border-b-2 border-primary pb-1">Editor</Link>
-            <Link href="/docs" className="text-sm font-bold text-slate-500 hover:text-primary transition-colors">Methodology</Link>
+          <nav className="hidden md:flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
+            <Link href="/" className="text-primary border-b-2 border-primary pb-1">Editor</Link>
+            <Link href="/docs" className="text-slate-400 hover:text-primary transition-colors">Methodology</Link>
           </nav>
         </div>
 
@@ -284,9 +284,9 @@ export default function RankForgeEditor() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden lg:flex w-[400px] border-r bg-white flex-col shrink-0">
+        <aside className="hidden lg:flex w-[400px] border-r bg-white flex-col shrink-0 overflow-hidden">
           <Tabs defaultValue="parameters" className="w-full flex flex-col h-full overflow-hidden">
-            <TabsList className="grid w-full grid-cols-2 rounded-none bg-slate-50 border-b h-12">
+            <TabsList className="grid w-full grid-cols-2 rounded-none bg-slate-50 border-b h-12 shrink-0">
               <TabsTrigger value="parameters" className="text-xs font-bold uppercase tracking-widest">Forge Setup</TabsTrigger>
               <TabsTrigger value="ai" className="text-xs font-bold uppercase tracking-widest">AI Foundry</TabsTrigger>
             </TabsList>

@@ -31,16 +31,16 @@ export default function DocumentationPage() {
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-body pb-20">
       {/* Navigation Header */}
       <header className="h-16 border-b bg-white flex items-center justify-between px-6 sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="bg-primary rounded-md p-1.5 transition-transform group-hover:scale-105">
               <Hammer className="h-5 w-5 text-white" />
             </div>
             <span className="font-extrabold tracking-tight text-primary text-lg">RankForge AI</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            <Link href="/" className="hover:text-primary transition-colors">Editor</Link>
-            <Link href="/docs" className="text-primary">Methodology</Link>
+          <nav className="hidden md:flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
+            <Link href="/" className="text-slate-400 hover:text-primary transition-colors">Editor</Link>
+            <Link href="/docs" className="text-primary border-b-2 border-primary pb-1">Methodology</Link>
           </nav>
         </div>
         <Button asChild variant="outline" size="sm" className="hidden sm:flex border-primary text-primary hover:bg-primary/5">
