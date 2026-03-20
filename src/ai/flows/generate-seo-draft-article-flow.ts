@@ -24,7 +24,7 @@ export type GenerateSeoDraftArticleInput = z.infer<typeof GenerateSeoDraftArticl
 
 const GenerateSeoDraftArticleOutputSchema = z.object({
   content: z.string().describe('The generated article or outline.'),
-  format: z.enum(['article', 'outline']),
+  format: z.enum(['article', 'outline']).describe('Must match the requested output format.'),
   seoAnalysis: z.object({
     overallAssessment: z.string(),
     suggestions: z.object({
@@ -80,12 +80,14 @@ Unique Insights/Data: {{{uniqueInsights}}}
 Core Objective: {{{coreObjective}}}
 Tone: {{{tone}}}
 Target Word Count: {{{targetWordCount}}}
+Requested Format: {{{outputFormat}}}
 
 STRICT CONSTRAINTS:
-1. WORD COUNT: The generated {{outputFormat}} MUST be as close as possible to {{{targetWordCount}}} words.
-2. FORMAT: Proper Markdown. Use TWO newlines between paragraphs.
-3. INTELLIGENCE: Provide actionable SEO/G.E.O insights in the seoAnalysis field.
-4. E.E.A.T: Prioritize the Unique Insights/Data to build authority.
+1. WORD COUNT: The generated content MUST be as close as possible to {{{targetWordCount}}} words.
+2. FORMAT FIELD: You MUST include the "format" field in your JSON output, and it MUST be "{{{outputFormat}}}".
+3. CONTENT STYLE: Proper Markdown. Use TWO newlines between paragraphs.
+4. INTELLIGENCE: Provide actionable SEO/G.E.O insights in the "seoAnalysis" object.
+5. E.E.A.T: Prioritize the Unique Insights/Data to build authority.
 
 {{#if isArticle}}
 ARTICLE STRUCTURE:
@@ -102,6 +104,22 @@ OUTLINE STRUCTURE:
 - Comprehensive section headings (H2/H3)
 - Detailed bullet points for each section to scope out the target word count
 {{/if}}
+
+REQUIRED JSON OUTPUT STRUCTURE:
+{
+  "content": "...",
+  "format": "{{{outputFormat}}}",
+  "seoAnalysis": {
+    "overallAssessment": "...",
+    "suggestions": {
+      "eEAT": [],
+      "gEO": [],
+      "readability": [],
+      "keywordDensity": [],
+      "links": []
+    }
+  }
+}
 
 Return strictly valid JSON.`,
 });
