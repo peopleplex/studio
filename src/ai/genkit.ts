@@ -3,7 +3,7 @@ import { googleAI } from '@genkit-ai/google-genai';
 
 /**
  * Genkit instance configured for professional SEO content generation.
- * Uses Gemini 1.5 Flash as the primary model for higher stability and quota limits.
+ * Uses Gemini 2.0 Flash as the primary default model.
  */
 const apiKey = process.env.GOOGLE_GENAI_API_KEY;
 
@@ -17,5 +17,5 @@ export const ai = genkit({
       apiKey: apiKey,
     }),
   ],
-  model: 'googleai/gemini-1.5-flash',
+  model: 'googleai/gemini-2.0-flash',
 });

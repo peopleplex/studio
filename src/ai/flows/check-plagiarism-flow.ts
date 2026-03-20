@@ -59,12 +59,16 @@ const checkPlagiarismFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const { output } = await plagiarismPrompt(input);
+      // Primary attempt using Gemini 2.0 Flash
+      const { output } = await plagiarismPrompt(input, {
+        model: 'googleai/gemini-2.0-flash',
+      });
       return output!;
     } catch (error) {
       console.warn('Originality check failed, retrying with fallback:', error);
+      // Fallback attempt using Gemini 2.5 Flash
       const { output } = await plagiarismPrompt(input, {
-        model: 'googleai/gemini-1.5-flash',
+        model: 'googleai/gemini-2.5-flash',
       });
       return output!;
     }

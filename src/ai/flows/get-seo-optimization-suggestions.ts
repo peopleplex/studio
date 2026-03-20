@@ -68,12 +68,16 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const { output } = await getSeoOptimizationSuggestionsPrompt(input);
+      // Primary attempt using Gemini 2.0 Flash
+      const { output } = await getSeoOptimizationSuggestionsPrompt(input, {
+        model: 'googleai/gemini-2.0-flash',
+      });
       return output!;
     } catch (error) {
       console.warn('Analysis failed, retrying with fallback:', error);
+      // Fallback attempt using Gemini 2.5 Flash
       const { output } = await getSeoOptimizationSuggestionsPrompt(input, {
-        model: 'googleai/gemini-1.5-flash',
+        model: 'googleai/gemini-2.5-flash',
       });
       return output!;
     }
