@@ -76,7 +76,7 @@ export default function RankForgeEditor() {
     readability: 'Poor',
   });
   
-  // Normalized suggestions state to handle both single-pass and manual analysis
+  // Normalized suggestions state
   const [suggestions, setSuggestions] = useState<GetSeoOptimizationSuggestionsOutput | null>(null);
   const [plagiarismReport, setPlagiarismReport] = useState<CheckPlagiarismOutput | null>(null);
   const { toast } = useToast();
@@ -108,7 +108,6 @@ export default function RankForgeEditor() {
       });
       setSuggestions(result);
     } catch (error: any) {
-      console.error('Analysis failed:', error);
       toast({
         variant: 'destructive',
         title: 'Analysis Error',
@@ -140,7 +139,6 @@ export default function RankForgeEditor() {
         description: `Originality risk: ${result.riskLevel}`,
       });
     } catch (error: any) {
-      console.error('Plagiarism check failed:', error);
       toast({
         variant: 'destructive',
         title: 'Check Failed',
@@ -167,7 +165,6 @@ export default function RankForgeEditor() {
     setPlagiarismReport(null);
     
     try {
-      // Single-Pass Call (Consolidated Generation + Analysis)
       const result = await generateSeoDraftArticle({
         topic,
         companyName,
@@ -186,7 +183,6 @@ export default function RankForgeEditor() {
       if (titleMatch) setTitle(titleMatch[1]);
       else setTitle(topic);
 
-      // Map single-pass SEO results to the suggestions state
       if (result.seoAnalysis) {
         setSuggestions({
           overallAssessment: result.seoAnalysis.overallAssessment,
@@ -196,7 +192,7 @@ export default function RankForgeEditor() {
             readability: result.seoAnalysis.suggestions.readability,
             keywordDensity: result.seoAnalysis.suggestions.keywordDensity,
             internalLinking: result.seoAnalysis.suggestions.links,
-            externalLinking: [], // Consolidated into links
+            externalLinking: [],
             contentFreshness: [],
             callToAction: [],
           }
@@ -205,11 +201,10 @@ export default function RankForgeEditor() {
       
       toast({
         title: 'Forge Complete',
-        description: `Content and Intelligence forged in one pass. Savings active.`,
+        description: `Content and Intelligence forged in one pass.`,
       });
 
     } catch (error: any) {
-      console.error('Forge Error Detail:', error);
       toast({
         variant: 'destructive',
         title: 'Forge Error',
@@ -238,7 +233,7 @@ export default function RankForgeEditor() {
     });
   };
 
-  const LeftPanelContent = () => (
+  const sidebarContent = (
     <Tabs defaultValue="parameters" className="w-full flex flex-col h-full overflow-hidden">
       <div className="px-4 py-3 border-b shrink-0">
         <TabsList className="grid w-full grid-cols-2 bg-slate-100/50">
@@ -422,7 +417,7 @@ export default function RankForgeEditor() {
               <SheetContent side="left" className="p-0 w-[300px]">
                 <SheetTitle className="sr-only">Forge Parameters</SheetTitle>
                 <SheetDescription className="sr-only">Configure your SEO content parameters and AI tools.</SheetDescription>
-                <LeftPanelContent />
+                {sidebarContent}
               </SheetContent>
             </Sheet>
           </div>
@@ -498,7 +493,7 @@ export default function RankForgeEditor() {
 
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden lg:flex w-[340px] border-r bg-white flex-col shrink-0">
-          <LeftPanelContent />
+          {sidebarContent}
         </aside>
 
         <main className="flex-1 bg-[#F1F5F9] relative flex flex-col p-3 sm:p-4 lg:p-6 overflow-hidden">
