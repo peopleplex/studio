@@ -1,10 +1,9 @@
-
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 
 /**
  * Genkit instance configured for professional SEO content generation.
- * Defaulting to Gemini 2.0 Flash with a fallback strategy implemented in flows.
+ * Uses the GOOGLE_GENAI_API_KEY mapped from App Hosting secrets.
  */
 export const ai = genkit({
   plugins: [
