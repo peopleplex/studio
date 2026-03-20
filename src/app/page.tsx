@@ -47,7 +47,8 @@ import {
   ShieldCheck,
   Users,
   Target,
-  BookOpen
+  BookOpen,
+  Info
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -270,6 +271,120 @@ export default function RankForgeEditor() {
     });
   };
 
+  const ForgeParameters = () => (
+    <div className="p-5 space-y-6 pb-20">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="topic" className="text-xs font-bold text-slate-500 uppercase">Primary Topic</Label>
+          <Input 
+            id="topic" 
+            placeholder="e.g. Modern Web Architecture" 
+            className="bg-slate-50/50"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="companyName" className="text-xs font-bold text-slate-500 uppercase">Company Name</Label>
+          <div className="relative">
+            <Building2 className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+            <Input 
+              id="companyName" 
+              placeholder="Your Brand Name" 
+              className="bg-slate-50/50 pl-8"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="companyOverview" className="text-xs font-bold text-slate-500 uppercase">Company Overview</Label>
+          <Textarea 
+            id="companyOverview" 
+            placeholder="Brief description of your organization..." 
+            className="bg-slate-50/50 min-h-[60px] resize-none text-sm"
+            value={companyDescription}
+            onChange={(e) => setCompanyDescription(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="audience" className="text-xs font-bold text-slate-500 uppercase">Target Audience</Label>
+          <div className="relative">
+            <Users className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+            <Input 
+              id="audience" 
+              placeholder="e.g. Senior Developers, CMOs" 
+              className="bg-slate-50/50 pl-8"
+              value={audienceInsights}
+              onChange={(e) => setAudienceInsights(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="uniqueInsights" className="text-xs font-bold text-slate-500 uppercase">Unique Insights / Data</Label>
+          <Textarea 
+            id="uniqueInsights" 
+            placeholder="Add specific stats, data points, or expert facts to avoid generic AI text..." 
+            className="bg-slate-50/50 min-h-[80px] resize-none text-sm"
+            value={uniqueInsights}
+            onChange={(e) => setUniqueInsights(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="objective" className="text-xs font-bold text-slate-500 uppercase">Core Objective</Label>
+          <Input 
+            id="objective" 
+            placeholder="The main takeaway for the reader" 
+            className="bg-slate-50/50"
+            value={coreObjective}
+            onChange={(e) => setCoreObjective(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="tone" className="text-xs font-bold text-slate-500 uppercase">Tone of Voice</Label>
+          <Select value={tone} onValueChange={setTone}>
+            <SelectTrigger className="bg-slate-50/50">
+              <SelectValue placeholder="Select tone" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Professional">Professional</SelectItem>
+              <SelectItem value="Conversational">Conversational</SelectItem>
+              <SelectItem value="Authoritative">Authoritative</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="keywords" className="text-xs font-bold text-slate-500 uppercase">Target Keywords</Label>
+          <Textarea 
+            id="keywords" 
+            placeholder="keyword1, keyword2..." 
+            className="bg-slate-50/50 min-h-[60px] resize-none"
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="wordcount" className="text-xs font-bold text-slate-500 uppercase">Target Word Count</Label>
+          <Input 
+            id="wordcount" 
+            type="number"
+            className="bg-slate-50/50"
+            value={targetWordCount}
+            onChange={(e) => setTargetWordCount(e.target.value)}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex flex-col h-screen bg-[#F8FAFC] overflow-hidden text-slate-900">
       <header className="h-14 border-b bg-white flex items-center justify-between px-4 lg:px-6 shrink-0 z-20">
@@ -308,24 +423,20 @@ export default function RankForgeEditor() {
 
                     <TabsContent value="parameters" className="flex-1 overflow-hidden m-0">
                       <ScrollArea className="h-full">
-                        <div className="p-5 space-y-6 pb-20">
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="topic-mobile" className="text-xs font-bold text-slate-500 uppercase">Primary Topic</Label>
-                              <Input 
-                                id="topic-mobile" 
-                                placeholder="e.g. Modern Web Architecture" 
-                                className="bg-slate-50/50"
-                                value={topic}
-                                onChange={(e) => setTopic(e.target.value)}
-                              />
-                            </div>
-                            {/* Rest of the form inputs mirrored for mobile view... */}
+                        <ForgeParameters />
+                      </ScrollArea>
+                    </TabsContent>
+                    
+                    <TabsContent value="ai" className="flex-1 overflow-hidden m-0">
+                      <ScrollArea className="h-full">
+                        <div className="p-5 space-y-6">
+                          <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-3">
+                            <Button onClick={() => handleGenerate('article')} disabled={isGenerating} className="w-full">Forge Article</Button>
+                            <Button variant="outline" onClick={() => handleGenerate('outline')} disabled={isGenerating} className="w-full">Forge Outline</Button>
                           </div>
                         </div>
                       </ScrollArea>
                     </TabsContent>
-                    {/* Additional TabsContent for 'ai'... */}
                   </Tabs>
                 </div>
               </SheetContent>
@@ -424,92 +535,7 @@ export default function RankForgeEditor() {
 
             <TabsContent value="parameters" className="flex-1 overflow-hidden m-0">
               <ScrollArea className="h-full">
-                <div className="p-5 space-y-6 pb-20">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="topic" className="text-xs font-bold text-slate-500 uppercase">Primary Topic</Label>
-                      <Input 
-                        id="topic" 
-                        placeholder="e.g. Modern Web Architecture" 
-                        className="bg-slate-50/50"
-                        value={topic}
-                        onChange={(e) => setTopic(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="audience" className="text-xs font-bold text-slate-500 uppercase">Target Audience</Label>
-                      <div className="relative">
-                        <Users className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
-                        <Input 
-                          id="audience" 
-                          placeholder="e.g. Senior Developers, CMOs" 
-                          className="bg-slate-50/50 pl-8"
-                          value={audienceInsights}
-                          onChange={(e) => setAudienceInsights(e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="uniqueInsights" className="text-xs font-bold text-slate-500 uppercase">Unique Insights / Data</Label>
-                      <Textarea 
-                        id="uniqueInsights" 
-                        placeholder="Add specific stats, data points, or expert facts to avoid generic AI text..." 
-                        className="bg-slate-50/50 min-h-[80px] resize-none text-sm"
-                        value={uniqueInsights}
-                        onChange={(e) => setUniqueInsights(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="objective" className="text-xs font-bold text-slate-500 uppercase">Core Objective</Label>
-                      <Input 
-                        id="objective" 
-                        placeholder="The main takeaway for the reader" 
-                        className="bg-slate-50/50"
-                        value={coreObjective}
-                        onChange={(e) => setCoreObjective(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="tone" className="text-xs font-bold text-slate-500 uppercase">Tone of Voice</Label>
-                      <Select value={tone} onValueChange={setTone}>
-                        <SelectTrigger className="bg-slate-50/50">
-                          <SelectValue placeholder="Select tone" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Professional">Professional</SelectItem>
-                          <SelectItem value="Conversational">Conversational</SelectItem>
-                          <SelectItem value="Authoritative">Authoritative</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="keywords" className="text-xs font-bold text-slate-500 uppercase">Target Keywords</Label>
-                      <Textarea 
-                        id="keywords" 
-                        placeholder="keyword1, keyword2..." 
-                        className="bg-slate-50/50 min-h-[60px] resize-none"
-                        value={keywords}
-                        onChange={(e) => setKeywords(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="wordcount" className="text-xs font-bold text-slate-500 uppercase">Target Word Count</Label>
-                      <Input 
-                        id="wordcount" 
-                        type="number"
-                        className="bg-slate-50/50"
-                        value={targetWordCount}
-                        onChange={(e) => setTargetWordCount(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <ForgeParameters />
               </ScrollArea>
             </TabsContent>
 
