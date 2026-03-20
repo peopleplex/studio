@@ -120,12 +120,13 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
     };
 
     try {
+      // Primary attempt using standard high-quota model
       const {output} = await articlePrompt(promptInput);
       return output!;
     } catch (error) {
-      console.warn('Gemini 2.0 failed, falling back to Gemini 2.5:', error);
+      console.warn('Initial generation attempt failed, retrying with fallback:', error);
       const {output} = await articlePrompt(promptInput, {
-        model: 'googleai/gemini-2.5-flash',
+        model: 'googleai/gemini-1.5-flash',
       });
       return output!;
     }

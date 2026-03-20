@@ -62,9 +62,9 @@ const checkPlagiarismFlow = ai.defineFlow(
       const { output } = await plagiarismPrompt(input);
       return output!;
     } catch (error) {
-      console.warn('Plagiarism check 2.0 failed, falling back to 2.5:', error);
+      console.warn('Originality check failed, retrying with fallback:', error);
       const { output } = await plagiarismPrompt(input, {
-        model: 'googleai/gemini-2.5-flash',
+        model: 'googleai/gemini-1.5-flash',
       });
       return output!;
     }
