@@ -50,7 +50,7 @@ export function SeoPanel({ metrics, suggestions, plagiarismReport, isLoading, co
     switch (level) {
       case 'Low': return 'text-emerald-600 bg-emerald-50';
       case 'Medium': return 'text-amber-600 bg-amber-50';
-      case 'High': return 'text-rose-600 bg-rose-50';
+      case 'High': return 'text-rose-600 bg-rose-50 border-rose-100';
       default: return 'text-slate-600 bg-slate-50';
     }
   };
@@ -101,29 +101,32 @@ export function SeoPanel({ metrics, suggestions, plagiarismReport, isLoading, co
             </div>
 
             {plagiarismReport && (
-              <div className="space-y-3 pt-4 border-t border-slate-100">
+              <div className={cn(
+                "space-y-3 pt-4 border-t border-slate-100 p-3 rounded-xl transition-all",
+                plagiarismReport.riskLevel === 'High' && "bg-rose-50/50 border border-rose-100"
+              )}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <ShieldCheck className="h-3.5 w-3.5 text-slate-900" />
+                    <ShieldCheck className={cn("h-3.5 w-3.5", plagiarismReport.riskLevel === 'High' ? "text-rose-600" : "text-slate-900")} />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-900">Originality Report</span>
                   </div>
-                  <Badge className={cn("text-[9px] border-none", getRiskColor(plagiarismReport.riskLevel))}>
+                  <Badge className={cn("text-[9px] border", getRiskColor(plagiarismReport.riskLevel))}>
                     {plagiarismReport.riskLevel} Risk
                   </Badge>
                 </div>
-                <div className="p-3 rounded-lg bg-slate-50 border border-slate-100 text-[11px] leading-relaxed text-slate-600">
+                <div className="p-3 rounded-lg bg-white/50 border border-slate-100 text-[11px] leading-relaxed text-slate-600 shadow-sm">
                   {plagiarismReport.analysis}
                 </div>
                 {plagiarismReport.findings.length > 0 && (
                   <div className="space-y-2">
                     {plagiarismReport.findings.map((finding, idx) => (
-                      <div key={idx} className="p-3 rounded-lg border border-amber-100 bg-amber-50/50 space-y-2">
+                      <div key={idx} className="p-3 rounded-lg border border-amber-100 bg-white/80 space-y-2 shadow-sm">
                         <div className="flex items-start gap-2">
                           <AlertTriangle className="h-3 w-3 mt-0.5 text-amber-500 shrink-0" />
                           <p className="text-[10px] italic font-medium text-slate-700">"{finding.segment}"</p>
                         </div>
-                        <p className="text-[10px] text-slate-500">{finding.reason}</p>
-                        <div className="flex items-start gap-2 pt-1 border-t border-amber-100/50">
+                        <p className="text-[10px] text-slate-500 leading-normal">{finding.reason}</p>
+                        <div className="flex items-start gap-2 pt-2 border-t border-amber-50/50">
                           <HelpCircle className="h-3 w-3 mt-0.5 text-emerald-500 shrink-0" />
                           <p className="text-[10px] font-bold text-emerald-700">{finding.suggestion}</p>
                         </div>
