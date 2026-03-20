@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview Optimized Genkit flow for generating SEO-optimized articles and intelligence in a single pass.
- * Surfaces detailed error messages to the client.
+ * Surfaces detailed error messages to the client and enforces strict word count targets.
  */
 
 import {ai} from '@/ai/genkit';
@@ -61,9 +61,15 @@ const articlePrompt = ai.definePrompt({
   prompt: `Act as a professional SEO/G.E.O Content Engineer. 
 Goal: Generate high-quality content AND SEO intelligence in ONE PASS.
 
+STRICT CONSTRAINT ON WORD COUNT:
+- Your target is EXACTLY {{{targetWordCount}}} words for the content field.
+- If the target is high (e.g., 1500+ words), you MUST go into extreme detail with multiple examples, case studies, and deep explanations for every point.
+- If the target is low (e.g., 500 words), be extremely concise and punchy.
+- DO NOT finish early. Expand on the "Unique Insights" provided to reach the word count naturally.
+
 STRICT CONSTRAINT ON ORIGINALITY: 
-- DO NOT start with generic tropes like "In a world...", "In today's fast-paced environment...", or "At its heart...".
-- Use the provided Unique Insights/Data to lead the article with a definitive, fresh perspective.
+- DO NOT use generic AI intro tropes.
+- Lead with specific data points or the unique perspective provided in the inputs.
 
 INPUT:
 Topic: {{{topic}}}
@@ -73,18 +79,18 @@ Target Audience: {{{audienceInsights}}}
 Unique Insights/Data: {{{uniqueInsights}}}
 Core Objective: {{{coreObjective}}}
 Tone: {{{tone}}}
-Target length: {{#if targetWordCount}}{{{targetWordCount}}}{{else}}1000{{/if}} words.
+Target Word Count: {{{targetWordCount}}}
 
 STRICT CONSTRAINTS:
-1. WORD COUNT: The generated {{outputFormat}} MUST be as close as possible to {{{targetWordCount}}} words. Expand on examples and data if target is high.
+1. WORD COUNT: The generated {{outputFormat}} MUST be as close as possible to {{{targetWordCount}}} words.
 2. FORMAT: Proper Markdown. Use TWO newlines between paragraphs.
-3. INTELLIGENCE: Provide actionable SEO insights in the seoAnalysis field.
-4. E.E.A.T: Prioritize the Unique Insights/Data to build authority. Ensure the content is "citeable" for AI engines.
+3. INTELLIGENCE: Provide actionable SEO/G.E.O insights in the seoAnalysis field.
+4. E.E.A.T: Prioritize the Unique Insights/Data to build authority.
 
 {{#if isArticle}}
 ARTICLE STRUCTURE:
 - H1 Title (# Title)
-- Hook-driven Intro (Using specific data/insights)
+- Hook Intro (Data-driven)
 - Multiple H2/H3 sections
 - Natural keyword integration
 - Definitive conclusion
@@ -93,8 +99,8 @@ ARTICLE STRUCTURE:
 {{#if isOutline}}
 OUTLINE STRUCTURE:
 - H1 Title
-- Exhaustive section headings (H2/H3)
-- Detailed bullet points for each section to reach the desired word count scope
+- Comprehensive section headings (H2/H3)
+- Detailed bullet points for each section to scope out the target word count
 {{/if}}
 
 Return strictly valid JSON.`,
