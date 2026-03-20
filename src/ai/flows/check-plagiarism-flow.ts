@@ -1,10 +1,7 @@
 'use server';
 /**
  * @fileOverview A Genkit flow for checking plagiarism and content originality.
- *
- * - checkPlagiarism - A function that analyzes content for plagiarism risk and originality.
- * - CheckPlagiarismInput - The input type for the checkPlagiarism function.
- * - CheckPlagiarismOutput - The return type for the checkPlagiarism function.
+ * Surfaces detailed error messages to the client.
  */
 
 import { ai } from '@/ai/genkit';
@@ -27,8 +24,14 @@ const CheckPlagiarismOutputSchema = z.object({
 });
 export type CheckPlagiarismOutput = z.infer<typeof CheckPlagiarismOutputSchema>;
 
-export async function checkPlagiarism(input: CheckPlagiarismInput): Promise<CheckPlagiarismOutput> {
-  return checkPlagiarismFlow(input);
+export async function checkPlagiarism(input: CheckPlagiarismInput): Promise<{ data?: CheckPlagiarismOutput; error?: string }> {
+  try {
+    const result = await checkPlagiarismFlow(input);
+    return { data: result };
+  } catch (err: any) {
+    console.error('Flow execution error:', err);
+    return { error: err.message || 'An unexpected error occurred during originality check.' };
+  }
 }
 
 const plagiarismPrompt = ai.definePrompt({
@@ -56,12 +59,10 @@ const checkPlagiarismFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      // Primary: Gemini 2.0 Flash
       const { output } = await plagiarismPrompt(input);
       return output!;
     } catch (error) {
       console.warn('Plagiarism check 2.0 failed, falling back to 2.5:', error);
-      // Fallback: Gemini 2.5 Flash
       const { output } = await plagiarismPrompt(input, {
         model: 'googleai/gemini-2.5-flash',
       });

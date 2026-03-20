@@ -1,9 +1,7 @@
 'use server';
 /**
  * @fileOverview Optimized Genkit flow for generating SEO-optimized articles and intelligence in a single pass.
- * Reduces token usage by avoiding re-sending large content for analysis.
- *
- * - generateSeoDraftArticle - Single-pass function for content and SEO insights.
+ * Surfaces detailed error messages to the client.
  */
 
 import {ai} from '@/ai/genkit';
@@ -43,8 +41,14 @@ const InternalPromptInputSchema = GenerateSeoDraftArticleInputSchema.extend({
   isOutline: z.boolean(),
 });
 
-export async function generateSeoDraftArticle(input: GenerateSeoDraftArticleInput): Promise<GenerateSeoDraftArticleOutput> {
-  return generateSeoDraftArticleFlow(input);
+export async function generateSeoDraftArticle(input: GenerateSeoDraftArticleInput): Promise<{ data?: GenerateSeoDraftArticleOutput; error?: string }> {
+  try {
+    const result = await generateSeoDraftArticleFlow(input);
+    return { data: result };
+  } catch (err: any) {
+    console.error('Flow execution error:', err);
+    return { error: err.message || 'An unexpected error occurred during content generation.' };
+  }
 }
 
 const articlePrompt = ai.definePrompt({
@@ -101,12 +105,10 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
     };
 
     try {
-      // Primary: Gemini 2.0 Flash
       const {output} = await articlePrompt(promptInput);
       return output!;
     } catch (error) {
       console.warn('Gemini 2.0 failed, falling back to Gemini 2.5:', error);
-      // Fallback: Gemini 2.5 Flash
       const {output} = await articlePrompt(promptInput, {
         model: 'googleai/gemini-2.5-flash',
       });

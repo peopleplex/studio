@@ -1,11 +1,7 @@
-
 'use server';
 /**
  * @fileOverview Provides AI-driven recommendations for SEO optimization.
- *
- * - getSeoOptimizationSuggestions - A function that generates SEO optimization suggestions for an article.
- * - GetSeoOptimizationSuggestionsInput - The input type for the getSeoOptimizationSuggestions function.
- * - GetSeoOptimizationSuggestionsOutput - The return type for the getSeoOptimizationSuggestions function.
+ * Surfaces detailed error messages to the client.
  */
 
 import { ai } from '@/ai/genkit';
@@ -35,8 +31,14 @@ export type GetSeoOptimizationSuggestionsOutput = z.infer<typeof GetSeoOptimizat
 
 export async function getSeoOptimizationSuggestions(
   input: GetSeoOptimizationSuggestionsInput
-): Promise<GetSeoOptimizationSuggestionsOutput> {
-  return getSeoOptimizationSuggestionsFlow(input);
+): Promise<{ data?: GetSeoOptimizationSuggestionsOutput; error?: string }> {
+  try {
+    const result = await getSeoOptimizationSuggestionsFlow(input);
+    return { data: result };
+  } catch (err: any) {
+    console.error('Flow execution error:', err);
+    return { error: err.message || 'An unexpected error occurred during SEO analysis.' };
+  }
 }
 
 const getSeoOptimizationSuggestionsPrompt = ai.definePrompt({
@@ -66,12 +68,10 @@ const getSeoOptimizationSuggestionsFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      // Primary: Gemini 2.0 Flash
       const { output } = await getSeoOptimizationSuggestionsPrompt(input);
       return output!;
     } catch (error) {
       console.warn('Analysis 2.0 failed, falling back to 2.5:', error);
-      // Fallback: Gemini 2.5 Flash
       const { output } = await getSeoOptimizationSuggestionsPrompt(input, {
         model: 'googleai/gemini-2.5-flash',
       });

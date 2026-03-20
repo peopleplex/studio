@@ -106,7 +106,16 @@ export default function RankForgeEditor() {
         targetKeywords: keywordList,
         geoOptimization: geoOptimization || undefined,
       });
-      setSuggestions(result);
+      
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Analysis Error',
+          description: result.error,
+        });
+      } else if (result.data) {
+        setSuggestions(result.data);
+      }
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -133,11 +142,20 @@ export default function RankForgeEditor() {
       const result = await checkPlagiarism({
         articleContent: content,
       });
-      setPlagiarismReport(result);
-      toast({
-        title: 'Plagiarism Check Complete',
-        description: `Originality risk: ${result.riskLevel}`,
-      });
+
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Originality Check Error',
+          description: result.error,
+        });
+      } else if (result.data) {
+        setPlagiarismReport(result.data);
+        toast({
+          title: 'Plagiarism Check Complete',
+          description: `Originality risk: ${result.data.riskLevel}`,
+        });
+      }
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -175,34 +193,43 @@ export default function RankForgeEditor() {
         targetWordCount: parseInt(targetWordCount) || undefined,
         geoOptimization: geoOptimization,
       });
-      
-      setContent(result.content);
-      setIsPreview(true);
-      
-      const titleMatch = result.content.match(/^# (.*)/);
-      if (titleMatch) setTitle(titleMatch[1]);
-      else setTitle(topic);
 
-      if (result.seoAnalysis) {
-        setSuggestions({
-          overallAssessment: result.seoAnalysis.overallAssessment,
-          suggestions: {
-            eEAT: result.seoAnalysis.suggestions.eEAT,
-            gEO: result.seoAnalysis.suggestions.gEO,
-            readability: result.seoAnalysis.suggestions.readability,
-            keywordDensity: result.seoAnalysis.suggestions.keywordDensity,
-            internalLinking: result.seoAnalysis.suggestions.links,
-            externalLinking: [],
-            contentFreshness: [],
-            callToAction: [],
-          }
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Forge Error',
+          description: result.error,
+        });
+      } else if (result.data) {
+        const forgeData = result.data;
+        setContent(forgeData.content);
+        setIsPreview(true);
+        
+        const titleMatch = forgeData.content.match(/^# (.*)/);
+        if (titleMatch) setTitle(titleMatch[1]);
+        else setTitle(topic);
+
+        if (forgeData.seoAnalysis) {
+          setSuggestions({
+            overallAssessment: forgeData.seoAnalysis.overallAssessment,
+            suggestions: {
+              eEAT: forgeData.seoAnalysis.suggestions.eEAT,
+              gEO: forgeData.seoAnalysis.suggestions.gEO,
+              readability: forgeData.seoAnalysis.suggestions.readability,
+              keywordDensity: forgeData.seoAnalysis.suggestions.keywordDensity,
+              internalLinking: forgeData.seoAnalysis.suggestions.links,
+              externalLinking: [],
+              contentFreshness: [],
+              callToAction: [],
+            }
+          });
+        }
+        
+        toast({
+          title: 'Forge Complete',
+          description: `Content and Intelligence forged in one pass.`,
         });
       }
-      
-      toast({
-        title: 'Forge Complete',
-        description: `Content and Intelligence forged in one pass.`,
-      });
 
     } catch (error: any) {
       toast({
