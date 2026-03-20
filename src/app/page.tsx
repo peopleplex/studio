@@ -12,6 +12,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { 
   Select, 
   SelectContent, 
   SelectItem, 
@@ -33,21 +39,16 @@ import {
   FileText, 
   Search,
   Hammer,
-  FileEdit,
   Eraser,
   Building2,
-  Hash,
-  BrainCircuit,
   Copy,
-  MessagesSquare,
   Eye,
   PenLine,
   BarChart4,
   Menu,
   ShieldCheck,
-  Users,
-  Target,
-  BookOpen,
+  Zap,
+  Layout,
   Info
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
@@ -271,265 +272,232 @@ export default function RankForgeEditor() {
     });
   };
 
-  const ForgeParameters = () => (
-    <div className="p-5 space-y-6 pb-20">
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="topic" className="text-xs font-bold text-slate-500 uppercase">Primary Topic</Label>
-          <Input 
-            id="topic" 
-            placeholder="e.g. Modern Web Architecture" 
-            className="bg-slate-50/50"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-          />
-        </div>
+  const ParameterSection = ({ label, children }: { label: string, children: React.ReactNode }) => (
+    <div className="space-y-3 mb-6">
+      <div className="flex items-center gap-2">
+        <div className="h-1 w-1 rounded-full bg-primary" />
+        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{label}</Label>
+      </div>
+      {children}
+    </div>
+  );
 
-        <div className="space-y-2">
-          <Label htmlFor="companyName" className="text-xs font-bold text-slate-500 uppercase">Company Name</Label>
-          <div className="relative">
-            <Building2 className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+  const ForgeParameters = () => (
+    <div className="p-6 space-y-2 pb-24">
+      <ParameterSection label="Core Identity">
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="topic" className="text-[11px] font-bold text-slate-500">Main Subject</Label>
             <Input 
-              id="companyName" 
-              placeholder="Your Brand Name" 
-              className="bg-slate-50/50 pl-8"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
+              id="topic" 
+              placeholder="e.g. Modern Web Architecture" 
+              className="bg-white border-slate-200 focus:border-primary shadow-sm h-10 text-sm"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="companyName" className="text-[11px] font-bold text-slate-500">Brand Name</Label>
+            <div className="relative">
+              <Building2 className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <Input 
+                id="companyName" 
+                placeholder="RankForge Inc." 
+                className="bg-white border-slate-200 pl-10 h-10 text-sm"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="companyOverview" className="text-[11px] font-bold text-slate-500">Company Overview</Label>
+            <Textarea 
+              id="companyOverview" 
+              placeholder="Describe what your brand does..." 
+              className="bg-white border-slate-200 min-h-[60px] resize-none text-sm"
+              value={companyDescription}
+              onChange={(e) => setCompanyDescription(e.target.value)}
             />
           </div>
         </div>
+      </ParameterSection>
 
-        <div className="space-y-2">
-          <Label htmlFor="companyOverview" className="text-xs font-bold text-slate-500 uppercase">Company Overview</Label>
-          <Textarea 
-            id="companyOverview" 
-            placeholder="Brief description of your organization..." 
-            className="bg-slate-50/50 min-h-[60px] resize-none text-sm"
-            value={companyDescription}
-            onChange={(e) => setCompanyDescription(e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="audience" className="text-xs font-bold text-slate-500 uppercase">Target Audience</Label>
-          <div className="relative">
-            <Users className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+      <ParameterSection label="Context & Data">
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="uniqueInsights" className="text-[11px] font-bold text-slate-500">Unique Insights (E.E.A.T)</Label>
+            <Textarea 
+              id="uniqueInsights" 
+              placeholder="Specific data points or expert facts..." 
+              className="bg-white border-slate-200 min-h-[100px] resize-none text-sm leading-relaxed"
+              value={uniqueInsights}
+              onChange={(e) => setUniqueInsights(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="audience" className="text-[11px] font-bold text-slate-500">Target Audience</Label>
             <Input 
               id="audience" 
-              placeholder="e.g. Senior Developers, CMOs" 
-              className="bg-slate-50/50 pl-8"
+              placeholder="e.g. CMOs, Content Strategy Leads" 
+              className="bg-white border-slate-200 h-10 text-sm"
               value={audienceInsights}
               onChange={(e) => setAudienceInsights(e.target.value)}
             />
           </div>
         </div>
+      </ParameterSection>
 
-        <div className="space-y-2">
-          <Label htmlFor="uniqueInsights" className="text-xs font-bold text-slate-500 uppercase">Unique Insights / Data</Label>
-          <Textarea 
-            id="uniqueInsights" 
-            placeholder="Add specific stats, data points, or expert facts to avoid generic AI text..." 
-            className="bg-slate-50/50 min-h-[80px] resize-none text-sm"
-            value={uniqueInsights}
-            onChange={(e) => setUniqueInsights(e.target.value)}
-          />
+      <ParameterSection label="Optimization">
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="keywords" className="text-[11px] font-bold text-slate-500">Target Keywords</Label>
+            <Textarea 
+              id="keywords" 
+              placeholder="seo content, geo strategy, ai writing..." 
+              className="bg-white border-slate-200 min-h-[60px] resize-none text-sm"
+              value={keywords}
+              onChange={(e) => setKeywords(e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-slate-500">Tone</Label>
+              <Select value={tone} onValueChange={setTone}>
+                <SelectTrigger className="bg-white border-slate-200 h-10 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Professional">Professional</SelectItem>
+                  <SelectItem value="Conversational">Conversational</SelectItem>
+                  <SelectItem value="Authoritative">Authoritative</SelectItem>
+                  <SelectItem value="Technical">Technical</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-slate-500">Word Count</Label>
+              <Input 
+                type="number"
+                className="bg-white border-slate-200 h-10 text-sm"
+                value={targetWordCount}
+                onChange={(e) => setTargetWordCount(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="objective" className="text-xs font-bold text-slate-500 uppercase">Core Objective</Label>
-          <Input 
-            id="objective" 
-            placeholder="The main takeaway for the reader" 
-            className="bg-slate-50/50"
-            value={coreObjective}
-            onChange={(e) => setCoreObjective(e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="tone" className="text-xs font-bold text-slate-500 uppercase">Tone of Voice</Label>
-          <Select value={tone} onValueChange={setTone}>
-            <SelectTrigger className="bg-slate-50/50">
-              <SelectValue placeholder="Select tone" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Professional">Professional</SelectItem>
-              <SelectItem value="Conversational">Conversational</SelectItem>
-              <SelectItem value="Authoritative">Authoritative</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="keywords" className="text-xs font-bold text-slate-500 uppercase">Target Keywords</Label>
-          <Textarea 
-            id="keywords" 
-            placeholder="keyword1, keyword2..." 
-            className="bg-slate-50/50 min-h-[60px] resize-none"
-            value={keywords}
-            onChange={(e) => setKeywords(e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="wordcount" className="text-xs font-bold text-slate-500 uppercase">Target Word Count</Label>
-          <Input 
-            id="wordcount" 
-            type="number"
-            className="bg-slate-50/50"
-            value={targetWordCount}
-            onChange={(e) => setTargetWordCount(e.target.value)}
-          />
-        </div>
-      </div>
+      </ParameterSection>
     </div>
   );
 
   return (
-    <div className="flex flex-col h-screen bg-[#F8FAFC] overflow-hidden text-slate-900">
-      <header className="h-14 border-b bg-white flex items-center justify-between px-4 lg:px-6 shrink-0 z-20">
-        <div className="flex items-center gap-3 lg:gap-8">
-          <div className="flex lg:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-[300px]">
-                <SheetTitle className="sr-only">Forge Parameters</SheetTitle>
-                <SheetDescription className="sr-only">Configure your SEO content parameters and AI tools.</SheetDescription>
-                <div className="p-4 border-b flex items-center gap-2">
-                   <Hammer className="h-4 w-4 text-primary" />
-                   <span className="font-bold text-primary">RankForge Menu</span>
-                </div>
-                <div className="p-4 flex flex-col gap-2">
-                  <Button asChild variant="ghost" className="justify-start text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-primary">
-                    <Link href="/">Editor</Link>
-                  </Button>
-                  <Button asChild variant="ghost" className="justify-start text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-primary">
-                    <Link href="/docs">Documentation</Link>
-                  </Button>
-                </div>
-                <Separator />
-                <div className="flex-1 overflow-hidden">
-                  <Tabs defaultValue="parameters" className="w-full flex flex-col h-full overflow-hidden">
-                    <div className="px-4 py-3 border-b shrink-0">
-                      <TabsList className="grid w-full grid-cols-2 bg-slate-100/50">
-                        <TabsTrigger value="parameters" className="text-xs">Forge Setup</TabsTrigger>
-                        <TabsTrigger value="ai" className="text-xs">AI Tools</TabsTrigger>
-                      </TabsList>
-                    </div>
-
-                    <TabsContent value="parameters" className="flex-1 overflow-hidden m-0">
-                      <ScrollArea className="h-full">
-                        <ForgeParameters />
-                      </ScrollArea>
-                    </TabsContent>
-                    
-                    <TabsContent value="ai" className="flex-1 overflow-hidden m-0">
-                      <ScrollArea className="h-full">
-                        <div className="p-5 space-y-6">
-                          <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-3">
-                            <Button onClick={() => handleGenerate('article')} disabled={isGenerating} className="w-full">Forge Article</Button>
-                            <Button variant="outline" onClick={() => handleGenerate('outline')} disabled={isGenerating} className="w-full">Forge Outline</Button>
-                          </div>
-                        </div>
-                      </ScrollArea>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="bg-primary rounded-md p-1">
-              <Hammer className="h-4 w-4 text-white" />
+    <div className="flex flex-col h-screen bg-[#F1F5F9] overflow-hidden text-slate-900 font-body">
+      <header className="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-30 shadow-sm">
+        <div className="flex items-center gap-10">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="bg-primary rounded-lg p-2 transition-transform group-hover:scale-105 shadow-primary/20 shadow-lg">
+              <Hammer className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold tracking-tight text-primary hidden sm:inline">RankForge AI</span>
-          </div>
+            <div className="flex flex-col">
+              <span className="font-extrabold tracking-tight text-slate-900 leading-none">RankForge</span>
+              <span className="text-[10px] font-bold text-primary uppercase tracking-[0.3em]">AI Studio</span>
+            </div>
+          </Link>
 
-          <nav className="hidden lg:flex items-center gap-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-             <Link href="/" className="text-primary">Editor</Link>
-             <Link href="/docs" className="hover:text-primary transition-colors">Documentation</Link>
+          <nav className="hidden lg:flex items-center gap-8">
+            <Link href="/" className="text-xs font-black uppercase tracking-widest text-primary border-b-2 border-primary pb-1">Editor</Link>
+            <Link href="/docs" className="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors">Methodology</Link>
           </nav>
           
-          <div className="h-4 w-px bg-slate-200 hidden lg:block"></div>
+          <div className="h-6 w-px bg-slate-200 hidden lg:block"></div>
           
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             <Input 
-              placeholder="Article Title..." 
-              className="border-none p-0 h-auto text-sm font-semibold focus-visible:ring-0 bg-transparent w-[120px] sm:w-[200px] lg:w-[250px]"
+              placeholder="Draft Untitled Article..." 
+              className="border-none p-0 h-auto text-sm font-bold focus-visible:ring-0 bg-transparent w-[300px] placeholder:text-slate-300"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            <div className="flex items-center gap-2 text-[9px] lg:text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-              <span className="hidden sm:inline">{isAnalyzing ? 'Analyzing...' : 'Intelligence Active'}</span>
-              <span className="hidden sm:inline">&bull;</span>
-              <span>{metrics.wordCount} words</span>
-            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-slate-400 lg:hidden">
-            <Link href="/docs">
-              <BookOpen className="h-5 w-5" />
-            </Link>
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center bg-slate-100 rounded-full px-4 py-1.5 gap-4">
+             <div className="flex items-center gap-1.5">
+                <FileText className="h-3 w-3 text-slate-400" />
+                <span className="text-[10px] font-black text-slate-600 uppercase">{metrics.wordCount} WORDS</span>
+             </div>
+             <div className="h-3 w-px bg-slate-200" />
+             <div className="flex items-center gap-1.5">
+                <Search className="h-3 w-3 text-slate-400" />
+                <span className="text-[10px] font-black text-slate-600 uppercase">{metrics.keywordDensity}% DENSITY</span>
+             </div>
+          </div>
+
+          <Separator orientation="vertical" className="h-6 mx-2 hidden sm:block" />
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleCopy}
+            title="Copy Content"
+            className="text-slate-400 hover:text-primary hover:bg-primary/5 transition-all"
+          >
+            <Copy className="h-5 w-5" />
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={clearEditor}
+            title="Clear Editor"
+            className="text-slate-400 hover:text-destructive hover:bg-destructive/5"
+          >
+            <Eraser className="h-5 w-5" />
           </Button>
 
-          <div className="lg:hidden flex items-center gap-1">
+          <div className="lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
-                  <BarChart4 className="h-5 w-5" />
+                <Button variant="outline" size="sm" className="border-primary text-primary font-bold h-9">
+                  <Menu className="h-4 w-4 mr-2" /> MENU
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="p-0 w-[320px] sm:w-[380px]">
-                <SheetTitle className="sr-only">SEO Intelligence</SheetTitle>
-                <SheetDescription className="sr-only">View SEO metrics and G.E.O optimization suggestions.</SheetDescription>
-                <SeoPanel 
-                  metrics={metrics} 
-                  suggestions={suggestions} 
-                  plagiarismReport={plagiarismReport}
-                  isLoading={isAnalyzing || isCheckingPlagiarism} 
-                  content={content}
-                />
+              <SheetContent side="left" className="p-0 w-[300px]">
+                <SheetTitle className="sr-only">RankForge AI Menu</SheetTitle>
+                <SheetDescription className="sr-only">Configuration and tools for SEO article forging.</SheetDescription>
+                <Tabs defaultValue="parameters" className="h-full flex flex-col">
+                   <TabsList className="grid grid-cols-2 rounded-none bg-slate-50 border-b h-14 shrink-0">
+                      <TabsTrigger value="parameters" className="text-[10px] font-bold uppercase">Setup</TabsTrigger>
+                      <TabsTrigger value="ai" className="text-[10px] font-bold uppercase">Tools</TabsTrigger>
+                   </TabsList>
+                   <div className="flex-1 overflow-hidden">
+                     <ScrollArea className="h-full">
+                       <TabsContent value="parameters" className="m-0">
+                         <ForgeParameters />
+                       </TabsContent>
+                       <TabsContent value="ai" className="m-0 p-6 space-y-6">
+                          <div className="space-y-3">
+                             <Button onClick={() => handleGenerate('article')} disabled={isGenerating} className="w-full h-12 rounded-xl shadow-lg shadow-primary/20">FORGE FULL ARTICLE</Button>
+                             <Button variant="outline" onClick={() => handleGenerate('outline')} disabled={isGenerating} className="w-full h-12 rounded-xl">FORGE OUTLINE</Button>
+                          </div>
+                       </TabsContent>
+                     </ScrollArea>
+                   </div>
+                </Tabs>
               </SheetContent>
             </Sheet>
           </div>
-
-          <div className="h-4 w-px bg-slate-200 mx-1 hidden sm:block"></div>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleCopy}
-            className="text-primary hover:bg-primary/5 h-8 px-2 sm:px-3 text-xs font-bold uppercase tracking-wider"
-          >
-            <Copy className="h-3.5 w-3.5 sm:mr-2" />
-            <span className="hidden sm:inline">Copy</span>
-          </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={clearEditor} 
-            className="text-slate-400 hover:text-destructive h-8 px-2 sm:px-3 text-xs"
-          >
-            <Eraser className="h-3.5 w-3.5" />
-          </Button>
         </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden lg:flex w-[340px] border-r bg-white flex-col shrink-0">
+        {/* Left Sidebar - Desktop */}
+        <aside className="hidden lg:flex w-[380px] border-r bg-white flex-col shrink-0 z-20">
           <Tabs defaultValue="parameters" className="w-full flex flex-col h-full overflow-hidden">
-            <div className="px-4 py-3 border-b shrink-0">
-              <TabsList className="grid w-full grid-cols-2 bg-slate-100/50">
-                <TabsTrigger value="parameters" className="text-xs">Forge Setup</TabsTrigger>
-                <TabsTrigger value="ai" className="text-xs">AI Tools</TabsTrigger>
+            <div className="h-14 border-b bg-slate-50/50 flex items-center px-4 shrink-0">
+              <TabsList className="grid w-full grid-cols-2 bg-slate-200/50 p-1 h-9 rounded-lg">
+                <TabsTrigger value="parameters" className="text-[10px] font-bold uppercase tracking-widest">Forge Setup</TabsTrigger>
+                <TabsTrigger value="ai" className="text-[10px] font-bold uppercase tracking-widest">AI Tools</TabsTrigger>
               </TabsList>
             </div>
 
@@ -541,57 +509,56 @@ export default function RankForgeEditor() {
 
             <TabsContent value="ai" className="flex-1 overflow-hidden m-0">
               <ScrollArea className="h-full">
-                <div className="p-5 space-y-6">
-                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-3">
-                    <div className="flex items-center gap-2 text-primary font-bold text-sm">
-                      <Sparkles className="h-4 w-4" />
-                      Content Forge
+                <div className="p-8 space-y-8">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-2">
+                       <Sparkles className="h-4 w-4 text-primary" />
+                       <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Content Foundry</span>
                     </div>
-                    <Button 
-                      onClick={() => handleGenerate('article')} 
-                      disabled={isGenerating} 
-                      className="w-full text-xs h-9"
-                    >
-                      {isGenerating ? "Forging..." : "Forge Full Article"}
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => handleGenerate('outline')} 
-                      disabled={isGenerating} 
-                      className="w-full text-xs h-9"
-                    >
-                      Forge Detailed Outline
-                    </Button>
+                    <Card className="p-6 border-primary/20 bg-primary/[0.02] rounded-2xl space-y-4">
+                       <p className="text-xs text-slate-500 leading-relaxed font-medium">Use your parameters to forge a high-ranking asset in one pass.</p>
+                       <Button 
+                        onClick={() => handleGenerate('article')} 
+                        disabled={isGenerating} 
+                        className="w-full h-12 rounded-xl text-xs font-bold shadow-lg shadow-primary/10 transition-all hover:scale-[1.02]"
+                       >
+                         {isGenerating ? "FORGING ASSET..." : "FORGE FULL ARTICLE"}
+                       </Button>
+                       <Button 
+                        variant="outline" 
+                        onClick={() => handleGenerate('outline')} 
+                        disabled={isGenerating} 
+                        className="w-full h-12 rounded-xl text-xs font-bold border-slate-200 hover:bg-slate-50"
+                       >
+                         FORGE DETAILED OUTLINE
+                       </Button>
+                    </Card>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-accent/5 border border-accent/10 space-y-3">
-                    <div className="flex items-center gap-2 text-accent font-bold text-sm">
-                      <BarChart4 className="h-4 w-4" />
-                      Manual Analysis
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-2">
+                       <BarChart4 className="h-4 w-4 text-accent" />
+                       <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Post-Forge Analysis</span>
                     </div>
-                    <Button 
-                      onClick={() => handleAnalyze()} 
-                      disabled={isAnalyzing || content.length < 50} 
-                      variant="outline"
-                      className="w-full text-xs h-9 border-accent text-accent"
-                    >
-                      {isAnalyzing ? "Analyzing..." : "Update SEO Intelligence"}
-                    </Button>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-slate-100 border border-slate-200 space-y-3">
-                    <div className="flex items-center gap-2 text-slate-600 font-bold text-sm">
-                      <ShieldCheck className="h-4 w-4" />
-                      Originality Guard
-                    </div>
-                    <Button 
-                      onClick={handleCheckPlagiarism} 
-                      disabled={isCheckingPlagiarism || content.length < 50} 
-                      variant="outline"
-                      className="w-full text-xs h-9"
-                    >
-                      {isCheckingPlagiarism ? "Checking..." : "Verify Originality"}
-                    </Button>
+                    <Card className="p-6 border-slate-200 rounded-2xl space-y-4">
+                       <p className="text-xs text-slate-500 leading-relaxed font-medium">Deep-audit your draft for G.E.O and E.E.A.T visibility signals.</p>
+                       <Button 
+                        onClick={() => handleAnalyze()} 
+                        disabled={isAnalyzing || content.length < 50} 
+                        variant="outline"
+                        className="w-full h-12 rounded-xl text-xs font-bold border-accent text-accent hover:bg-accent/5"
+                       >
+                         {isAnalyzing ? "ANALYZING SIGNALS..." : "UPDATE SEO INTELLIGENCE"}
+                       </Button>
+                       <Button 
+                        onClick={handleCheckPlagiarism} 
+                        disabled={isCheckingPlagiarism || content.length < 50} 
+                        variant="outline"
+                        className="w-full h-12 rounded-xl text-xs font-bold"
+                       >
+                         {isCheckingPlagiarism ? "CHECKING GUARD..." : "VERIFY ORIGINALITY"}
+                       </Button>
+                    </Card>
                   </div>
                 </div>
               </ScrollArea>
@@ -599,85 +566,109 @@ export default function RankForgeEditor() {
           </Tabs>
         </aside>
 
-        <main className="flex-1 bg-[#F1F5F9] relative flex flex-col p-3 sm:p-4 lg:p-6 overflow-hidden">
-          <div className="flex-1 max-w-5xl mx-auto w-full bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col relative">
-            <div className="h-10 border-b bg-slate-50/50 flex items-center px-4 justify-between shrink-0">
-              <div className="flex items-center gap-2 sm:gap-4">
-                <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider">
-                  {isPreview ? 'Preview' : 'Editor'}
-                </Badge>
-              </div>
+        {/* Editor Area */}
+        <main className="flex-1 bg-slate-50 relative flex flex-col p-4 lg:p-10 overflow-hidden items-center">
+          <div className="w-full max-w-4xl h-full flex flex-col group">
+            {/* Editor Toolbar */}
+            <div className="flex items-center justify-between px-6 py-3 bg-white border border-slate-200 border-b-0 rounded-t-2xl shrink-0 transition-colors group-focus-within:border-primary/20">
+               <div className="flex items-center gap-3">
+                 <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest border-slate-200 text-slate-400 px-3 py-1">
+                   {isPreview ? 'Preview Mode' : 'Editor Active'}
+                 </Badge>
+                 {isAnalyzing && <div className="animate-pulse h-2 w-2 rounded-full bg-accent" />}
+               </div>
 
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
-                <button 
-                  onClick={() => setIsPreview(false)}
-                  className={cn(
-                    "flex items-center gap-1 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all",
-                    !isPreview ? "bg-white text-primary shadow-sm" : "text-slate-400"
-                  )}
-                >
-                  <PenLine className="h-3 w-3" /> Edit
-                </button>
-                <button 
-                  onClick={() => setIsPreview(true)}
-                  className={cn(
-                    "flex items-center gap-1 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all",
-                    isPreview ? "bg-white text-primary shadow-sm" : "text-slate-400"
-                  )}
-                >
-                  <Eye className="h-3 w-3" /> View
-                </button>
-              </div>
+               <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                 <button 
+                   onClick={() => setIsPreview(false)}
+                   className={cn(
+                     "flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
+                     !isPreview ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600"
+                   )}
+                 >
+                   <PenLine className="h-3.5 w-3.5" /> Edit
+                 </button>
+                 <button 
+                   onClick={() => setIsPreview(true)}
+                   className={cn(
+                     "flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
+                     isPreview ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-600"
+                   )}
+                 >
+                   <Eye className="h-3.5 w-3.5" /> View
+                 </button>
+               </div>
             </div>
 
-            <div className="flex-1 p-4 sm:p-8 lg:p-12 overflow-y-auto custom-scrollbar bg-white">
-              {content.length === 0 && !isGenerating && (
-                <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-200">
-                    <FileEdit className="h-6 w-6 text-slate-300" />
-                  </div>
-                  <h2 className="text-lg font-bold text-slate-800">Start Your Forge</h2>
-                </div>
-              )}
-
-              {isGenerating && (
-                <div className="h-full flex flex-col items-center justify-center space-y-6">
-                  <div className="relative">
-                    <div className="absolute inset-0 animate-ping h-full w-full rounded-full bg-primary/20"></div>
-                    <div className="relative bg-white p-5 rounded-3xl border shadow-lg">
-                      <Sparkles className="h-10 w-10 text-primary animate-pulse" />
+            {/* Editor Canvas */}
+            <div className="flex-1 bg-white border border-slate-200 rounded-b-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+              <ScrollArea className="flex-1">
+                <div className="p-8 lg:p-16 min-h-full flex flex-col">
+                  {content.length === 0 && !isGenerating && (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center py-20">
+                      <div className="w-20 h-20 rounded-3xl bg-slate-50 flex items-center justify-center border border-slate-100 mb-6 transition-transform hover:rotate-6">
+                        <Layout className="h-10 w-10 text-slate-200" />
+                      </div>
+                      <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">Your Canvas is Ready</h2>
+                      <p className="text-sm text-slate-400 max-w-xs mx-auto mt-2 leading-relaxed">
+                        Set your parameters in the sidebar and forge your content using the AI Tools panel.
+                      </p>
                     </div>
-                  </div>
-                  <h2 className="text-lg font-black tracking-tight text-slate-800 uppercase">Forging Your Content...</h2>
-                </div>
-              )}
+                  )}
 
-              {!isGenerating && content.length > 0 && (
-                isPreview ? (
-                  <div className="prose prose-slate max-w-none prose-headings:font-headline">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-                  </div>
-                ) : (
-                  <Textarea 
-                    className="w-full border-none resize-none p-0 text-lg leading-relaxed focus-visible:ring-0 min-h-full font-body"
-                    placeholder="Your article content goes here..."
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                  />
-                )
-              )}
+                  {isGenerating && (
+                    <div className="flex-1 flex flex-col items-center justify-center space-y-8 py-20">
+                      <div className="relative">
+                        <div className="absolute inset-0 animate-ping h-full w-full rounded-full bg-primary/10"></div>
+                        <div className="relative bg-white p-8 rounded-[2.5rem] border-2 border-primary/5 shadow-2xl">
+                          <Sparkles className="h-12 w-12 text-primary animate-pulse" />
+                        </div>
+                      </div>
+                      <div className="text-center space-y-2">
+                        <h2 className="text-lg font-black tracking-[0.2em] text-slate-800 uppercase">Forging Artifact</h2>
+                        <p className="text-xs font-bold text-slate-400 animate-pulse uppercase tracking-widest">Applying E.E.A.T Logic...</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!isGenerating && content.length > 0 && (
+                    isPreview ? (
+                      <div className="prose prose-slate max-w-none prose-headings:font-headline prose-h1:text-4xl prose-h1:font-black prose-p:leading-loose prose-p:text-slate-600">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <Textarea 
+                        className="w-full border-none resize-none p-0 text-lg leading-relaxed focus-visible:ring-0 min-h-full font-body placeholder:text-slate-200 text-slate-700"
+                        placeholder="Start engineering your content here..."
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                      />
+                    )
+                  )}
+                </div>
+              </ScrollArea>
             </div>
-          </div>
-          
-          <div className="h-10 flex items-center justify-between px-2 pt-2 shrink-0">
-             <div className="flex gap-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-               <span className="flex items-center gap-1"><FileText className="h-3 w-3 text-primary" /> {metrics.wordCount}</span>
-               <span className="flex items-center gap-1"><Search className="h-3 w-3 text-accent" /> {metrics.keywordDensity}%</span>
-             </div>
+            
+            <div className="h-12 flex items-center justify-between px-2 shrink-0">
+               <div className="flex gap-6">
+                 <div className="flex items-center gap-2 group cursor-help">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-emerald-600 transition-colors">Intelligence Active</span>
+                 </div>
+                 <div className="flex items-center gap-2 group">
+                    <Zap className="h-3.5 w-3.5 text-primary group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">AI Forged</span>
+                 </div>
+               </div>
+               <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  <span className="flex items-center gap-1.5"><FileText className="h-3 w-3" /> {metrics.wordCount} WORDS</span>
+               </div>
+            </div>
           </div>
         </main>
 
-        <aside className="hidden lg:flex w-[340px] border-l bg-white flex-col shrink-0">
+        {/* Right Sidebar - Desktop */}
+        <aside className="hidden xl:flex w-[420px] border-l bg-white flex-col shrink-0 z-20">
           <SeoPanel 
             metrics={metrics} 
             suggestions={suggestions} 
@@ -687,12 +678,6 @@ export default function RankForgeEditor() {
           />
         </aside>
       </div>
-      
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
-      `}</style>
     </div>
   );
 }
