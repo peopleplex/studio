@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { 
@@ -20,16 +21,12 @@ import {
   Search,
   Hammer,
   Eraser,
-  Building2,
   Copy,
-  Eye,
-  PenLine,
   BarChart4,
-  Menu,
-  ShieldCheck,
   Zap,
-  Layout,
-  Info
+  Settings2,
+  ChevronRight,
+  Layout
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -250,34 +247,145 @@ export default function RankForgeEditor() {
     });
   };
 
+  const ParameterSidebar = () => (
+    <Tabs defaultValue="parameters" className="w-full flex flex-col h-full">
+      <TabsList className="grid w-full grid-cols-2 rounded-none bg-slate-50 border-b">
+        <TabsTrigger value="parameters">Parameters</TabsTrigger>
+        <TabsTrigger value="ai">AI Tools</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="parameters" className="flex-1 overflow-y-auto m-0 p-4">
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Targeting</h3>
+            <div className="space-y-2">
+              <Label htmlFor="topic">Topic</Label>
+              <Input id="topic" placeholder="e.g. Benefits of SEO" value={topic} onChange={(e) => setTopic(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="keywords">Keywords (comma separated)</Label>
+              <Textarea id="keywords" placeholder="seo, ranking, content marketing" value={keywords} onChange={(e) => setKeywords(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Brand Context</h3>
+            <div className="space-y-2">
+              <Label htmlFor="companyName">Company Name</Label>
+              <Input id="companyName" placeholder="My Organization" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="companyOverview">Organization Overview</Label>
+              <Textarea id="companyOverview" placeholder="Describe your brand..." value={companyDescription} onChange={(e) => setCompanyDescription(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Configuration</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Tone</Label>
+                <select value={tone} onChange={(e) => setTone(e.target.value)} className="w-full rounded-md border border-input px-3 py-2 text-sm">
+                  <option>Professional</option>
+                  <option>Conversational</option>
+                  <option>Technical</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label>Word Count</Label>
+                <Input type="number" value={targetWordCount} onChange={(e) => setTargetWordCount(e.target.value)} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="ai" className="flex-1 p-4 space-y-4">
+        <div className="p-4 rounded-lg bg-primary/5 border border-primary/10 space-y-3">
+          <p className="text-xs font-medium text-primary flex items-center gap-2">
+            <Zap className="h-3 w-3" /> Generator
+          </p>
+          <Button onClick={() => handleGenerate('article')} disabled={isGenerating} className="w-full">Forge Article</Button>
+          <Button variant="outline" onClick={() => handleGenerate('outline')} disabled={isGenerating} className="w-full">Forge Outline</Button>
+        </div>
+
+        <div className="p-4 rounded-lg border space-y-3">
+          <p className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+            <BarChart4 className="h-3 w-3" /> Analysis
+          </p>
+          <Button onClick={handleAnalyze} disabled={isAnalyzing || content.length < 50} variant="outline" className="w-full">Update SEO Intel</Button>
+          <Button onClick={handleCheckPlagiarism} disabled={isCheckingPlagiarism || content.length < 50} variant="outline" className="w-full">Check Originality</Button>
+        </div>
+      </TabsContent>
+    </Tabs>
+  );
+
   return (
     <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
-      <header className="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50 sticky top-0 shadow-sm">
-        <div className="flex items-center gap-6">
+      <header className="h-16 border-b bg-white flex items-center justify-between px-4 md:px-6 shrink-0 z-50 sticky top-0 shadow-sm">
+        <div className="flex items-center gap-4 md:gap-6">
           <Link href="/" className="flex items-center gap-2">
-            <div className="bg-primary rounded-md p-1.5">
+            <div className="bg-primary rounded-md p-1.5 shrink-0">
               <Hammer className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-primary">RankForge AI</span>
+            <span className="font-bold text-primary hidden sm:inline-block">RankForge AI</span>
           </Link>
           <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
             <Link href="/" className="text-primary border-b-2 border-primary pb-1">Editor</Link>
-            <Link href="/docs" className="text-muted-foreground hover:text-primary transition-colors">Documentation</Link>
+            <Link href="/docs" className="text-muted-foreground hover:text-primary transition-colors">Methodology</Link>
           </nav>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="lg:hidden flex items-center gap-1">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Settings2 className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0 w-80">
+                <SheetHeader className="p-4 border-b">
+                  <SheetTitle className="text-sm font-bold uppercase tracking-widest">Setup & Tools</SheetTitle>
+                </SheetHeader>
+                <ParameterSidebar />
+              </SheetContent>
+            </Sheet>
+
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <BarChart4 className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="p-0 w-80 md:w-96">
+                <SheetHeader className="p-4 border-b">
+                  <SheetTitle className="text-sm font-bold uppercase tracking-widest">SEO Insights</SheetTitle>
+                </SheetHeader>
+                <SeoPanel 
+                  metrics={metrics} 
+                  suggestions={suggestions} 
+                  plagiarismReport={plagiarismReport}
+                  isLoading={isAnalyzing || isCheckingPlagiarism} 
+                  content={content}
+                />
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          <Separator orientation="vertical" className="h-4 mx-1 lg:hidden" />
+
           <Input 
             placeholder="Draft Title..." 
-            className="border-none h-auto py-1 text-sm font-medium focus-visible:ring-0 bg-transparent w-[200px]"
+            className="border-none h-auto py-1 text-sm font-medium focus-visible:ring-0 bg-transparent w-[120px] sm:w-[200px]"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <Separator orientation="vertical" className="h-4 mx-1" />
-          <Button variant="ghost" size="icon" onClick={handleCopy}>
+          <Separator orientation="vertical" className="h-4 mx-1 hidden sm:block" />
+          <Button variant="ghost" size="icon" onClick={handleCopy} className="hidden sm:inline-flex">
             <Copy className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={clearEditor} className="text-destructive">
+          <Button variant="ghost" size="icon" onClick={clearEditor} className="text-destructive hidden sm:inline-flex">
             <Eraser className="h-4 w-4" />
           </Button>
         </div>
@@ -285,104 +393,38 @@ export default function RankForgeEditor() {
 
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden lg:flex w-80 border-r bg-white flex-col shrink-0">
-          <Tabs defaultValue="parameters" className="w-full flex flex-col h-full">
-            <TabsList className="grid w-full grid-cols-2 rounded-none bg-slate-50 border-b">
-              <TabsTrigger value="parameters">Parameters</TabsTrigger>
-              <TabsTrigger value="ai">AI Tools</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="parameters" className="flex-1 overflow-y-auto m-0 p-4">
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Targeting</h3>
-                  <div className="space-y-2">
-                    <Label htmlFor="topic">Topic</Label>
-                    <Input id="topic" placeholder="e.g. Benefits of SEO" value={topic} onChange={(e) => setTopic(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="keywords">Keywords (comma separated)</Label>
-                    <Textarea id="keywords" placeholder="seo, ranking, content marketing" value={keywords} onChange={(e) => setKeywords(e.target.value)} />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Brand Context</h3>
-                  <div className="space-y-2">
-                    <Label htmlFor="companyName">Company Name</Label>
-                    <Input id="companyName" placeholder="My Organization" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="companyOverview">Organization Overview</Label>
-                    <Textarea id="companyOverview" placeholder="Describe your brand..." value={companyDescription} onChange={(e) => setCompanyDescription(e.target.value)} />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Configuration</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Tone</Label>
-                      <select value={tone} onChange={(e) => setTone(e.target.value)} className="w-full rounded-md border border-input px-3 py-2 text-sm">
-                        <option>Professional</option>
-                        <option>Conversational</option>
-                        <option>Technical</option>
-                      </select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Word Count</Label>
-                      <Input type="number" value={targetWordCount} onChange={(e) => setTargetWordCount(e.target.value)} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="ai" className="flex-1 p-4 space-y-4">
-              <div className="p-4 rounded-lg bg-primary/5 border border-primary/10 space-y-3">
-                <p className="text-xs font-medium text-primary flex items-center gap-2">
-                  <Zap className="h-3 w-3" /> Generator
-                </p>
-                <Button onClick={() => handleGenerate('article')} disabled={isGenerating} className="w-full">Forge Article</Button>
-                <Button variant="outline" onClick={() => handleGenerate('outline')} disabled={isGenerating} className="w-full">Forge Outline</Button>
-              </div>
-
-              <div className="p-4 rounded-lg border space-y-3">
-                <p className="text-xs font-medium text-muted-foreground flex items-center gap-2">
-                  <BarChart4 className="h-3 w-3" /> Analysis
-                </p>
-                <Button onClick={handleAnalyze} disabled={isAnalyzing || content.length < 50} variant="outline" className="w-full">Update SEO Intel</Button>
-                <Button onClick={handleCheckPlagiarism} disabled={isCheckingPlagiarism || content.length < 50} variant="outline" className="w-full">Check Originality</Button>
-              </div>
-            </TabsContent>
-          </Tabs>
+          <ParameterSidebar />
         </aside>
 
-        <main className="flex-1 flex flex-col bg-white">
-          <div className="h-12 border-b flex items-center justify-between px-6 shrink-0">
+        <main className="flex-1 flex flex-col bg-white overflow-hidden">
+          <div className="h-12 border-b flex items-center justify-between px-6 shrink-0 bg-white z-10">
              <div className="flex items-center gap-4">
-               <button onClick={() => setIsPreview(false)} className={cn("text-sm font-medium pb-3 mt-3", !isPreview ? "text-primary border-b-2 border-primary" : "text-muted-foreground")}>Edit</button>
-               <button onClick={() => setIsPreview(true)} className={cn("text-sm font-medium pb-3 mt-3", isPreview ? "text-primary border-b-2 border-primary" : "text-muted-foreground")}>Preview</button>
+               <button onClick={() => setIsPreview(false)} className={cn("text-sm font-medium h-full border-b-2 transition-colors", !isPreview ? "text-primary border-primary" : "text-muted-foreground border-transparent")}>Edit</button>
+               <button onClick={() => setIsPreview(true)} className={cn("text-sm font-medium h-full border-b-2 transition-colors", isPreview ? "text-primary border-primary" : "text-muted-foreground border-transparent")}>Preview</button>
              </div>
-             <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><FileText className="h-3 w-3" /> {metrics.wordCount} Words</span>
-                <span className="flex items-center gap-1"><Search className="h-3 w-3" /> {metrics.keywordDensity}% Density</span>
+             <div className="flex items-center gap-4 text-[10px] md:text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                <span className="flex items-center gap-1.5"><FileText className="h-3 w-3 text-slate-400" /> {metrics.wordCount} words</span>
+                <span className="flex items-center gap-1.5"><Search className="h-3 w-3 text-slate-400" /> {metrics.keywordDensity}% density</span>
              </div>
           </div>
 
           <ScrollArea className="flex-1">
-            <div className="p-8 max-w-3xl mx-auto">
+            <div className="p-4 md:p-8 max-w-3xl mx-auto">
               {isGenerating ? (
                 <div className="h-64 flex flex-col items-center justify-center space-y-4">
-                  <Sparkles className="h-8 w-8 text-primary animate-pulse" />
-                  <p className="text-sm font-medium animate-pulse">Forging content...</p>
+                  <div className="relative">
+                    <Sparkles className="h-8 w-8 text-primary animate-pulse" />
+                    <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-ping" />
+                  </div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse">Forging high-value content...</p>
                 </div>
               ) : isPreview ? (
-                <div className="prose prose-slate max-w-none">
+                <div className="prose prose-slate max-w-none prose-headings:font-black prose-p:leading-relaxed">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
                 </div>
               ) : (
                 <Textarea 
-                  className="w-full min-h-[600px] border-none resize-none p-0 text-base leading-relaxed focus-visible:ring-0 bg-transparent"
+                  className="w-full min-h-[600px] border-none resize-none p-0 text-base leading-relaxed focus-visible:ring-0 bg-transparent placeholder:text-slate-200"
                   placeholder="Start writing or forge from the side panel..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
