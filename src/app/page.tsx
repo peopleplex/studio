@@ -111,6 +111,11 @@ function ParameterSidebarContent({
                   <option>Professional</option>
                   <option>Conversational</option>
                   <option>Technical</option>
+                  <option>Educational</option>
+                  <option>Authoritative</option>
+                  <option>Persuasive</option>
+                  <option>Casual</option>
+                  <option>Friendly</option>
                 </select>
               </div>
               <div className="space-y-2">
