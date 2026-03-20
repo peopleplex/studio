@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
-  CheckCircle2, 
   Sparkles, 
   MapPin, 
   Search, 
