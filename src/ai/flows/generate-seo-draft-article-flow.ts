@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview Optimized Genkit flow for generating SEO-optimized articles.
- * Enforces strict JSON output to prevent UI parsing errors.
+ * Enforces strict word count adherence and JSON output.
  */
 
 import {ai} from '@/ai/genkit';
@@ -61,18 +61,23 @@ const articlePrompt = ai.definePrompt({
   name: 'generateSeoDraftArticlePrompt',
   input: {schema: InternalPromptInputSchema},
   output: {schema: GenerateSeoDraftArticleOutputSchema},
-  config: { maxOutputTokens: 4096, temperature: 0.7 },
-  prompt: `You are a specialized JSON Content API. You MUST return valid JSON matching the provided schema.
+  config: { maxOutputTokens: 8192, temperature: 0.7 },
+  prompt: `You are a specialized Content Engineering API. You MUST return valid JSON matching the provided schema.
 
 TASK: Generate a high-quality, SEO-optimized {{{outputFormat}}} about "{{{topic}}}".
 
-STRICT CONSTRAINTS:
-1. OUTPUT FORMAT: You must return ONLY valid JSON. Do not include markdown code blocks (no \`\`\`json).
-2. ANTI-PLAGIARISM: Do not use common AI intros. Start with unique insights. Use "Burstiness" (varied sentence lengths).
-3. INFORMATION GAIN: Every section must provide new value.
-4. WORD COUNT: Aim for approximately {{{targetWordCount}}} words.
+STRICT WORD COUNT CONSTRAINT:
+- TARGET: {{{targetWordCount}}} words.
+- CRITICAL: You MUST adhere as closely as possible to this word count. 
+- If the target is high (e.g., 1000+ words), DO NOT use fluff or repetition. Instead, provide deeper analysis, more sub-headers (H3s), detailed examples, and expanded explanations of the provided "Unique Insights".
+- If the target is low, be concise and punchy.
 
-INPUT:
+STRICT FORMATTING CONSTRAINTS:
+1. OUTPUT: Return ONLY valid JSON.
+2. ANTI-PLAGIARISM: Do not use common AI intros like "In today's fast-paced world...". Start with the core value proposition.
+3. INFORMATION GAIN: Ensure every section adds new, specific value.
+
+INPUT DATA:
 Topic: {{{topic}}}
 Keywords: {{#each keywords}}"{{this}}" {{/each}}
 {{#if companyName}}Brand: {{{companyName}}} ({{{companyDescription}}}){{/if}}
@@ -81,14 +86,14 @@ Unique Insights: {{{uniqueInsights}}}
 Tone: {{{tone}}}
 
 {{#if isArticle}}
-STRUCTURE: H1 Title,hook intro, multiple H2/H3 sections, conclusion.
+STRUCTURE: H1 Title, engaging hook, multiple H2/H3 sections with deep content to meet word count, and a strategic conclusion.
 {{/if}}
 
 {{#if isOutline}}
-STRUCTURE: H1 Title, detailed bullet points for each section.
+STRUCTURE: H1 Title, extremely detailed bullet points for each section that provide enough context to write the full piece.
 {{/if}}
 
-REQUIRED JSON STRUCTURE (Ensure ALL fields are present):
+REQUIRED JSON STRUCTURE:
 {
   "content": "...",
   "format": "{{{outputFormat}}}",
@@ -119,9 +124,11 @@ const generateSeoDraftArticleFlow = ai.defineFlow(
     };
 
     try {
+      // Primary model: Gemini 2.0 Flash
       return await runWithModel('googleai/gemini-2.0-flash');
     } catch (error) {
-      console.warn('Primary model failed, falling back:', error);
+      console.warn('Primary model failed, falling back to Gemini 2.5 Flash:', error);
+      // Fallback model: Gemini 2.5 Flash
       return await runWithModel('googleai/gemini-2.5-flash');
     }
   }
