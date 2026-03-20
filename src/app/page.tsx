@@ -43,7 +43,9 @@ import {
   BarChart4,
   Menu,
   ShieldCheck,
-  AlertTriangle
+  Users,
+  Lightbulb,
+  Target
 } from 'lucide-react';
 import { generateSeoDraftArticle } from '@/ai/flows/generate-seo-draft-article-flow';
 import { getSeoOptimizationSuggestions, type GetSeoOptimizationSuggestionsOutput } from '@/ai/flows/get-seo-optimization-suggestions';
@@ -56,6 +58,9 @@ export default function RankForgeEditor() {
   const [topic, setTopic] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [companyDescription, setCompanyDescription] = useState('');
+  const [audienceInsights, setAudienceInsights] = useState('');
+  const [uniqueInsights, setUniqueInsights] = useState('');
+  const [coreObjective, setCoreObjective] = useState('');
   const [keywords, setKeywords] = useState('');
   const [tone, setTone] = useState('Professional');
   const [geoOptimization, setGeoOptimization] = useState('SearchGPT, Google SGE');
@@ -187,6 +192,9 @@ export default function RankForgeEditor() {
         topic,
         companyName,
         companyDescription,
+        audienceInsights,
+        uniqueInsights,
+        coreObjective,
         keywords: keywordList,
         tone,
         outputFormat: format,
@@ -285,6 +293,46 @@ export default function RankForgeEditor() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="audience" className="text-xs font-bold text-slate-500 uppercase">Target Audience</Label>
+                <div className="relative">
+                  <Users className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                  <Input 
+                    id="audience" 
+                    placeholder="e.g. Senior Developers, CMOs" 
+                    className="bg-slate-50/50 pl-8"
+                    value={audienceInsights}
+                    onChange={(e) => setAudienceInsights(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="uniqueInsights" className="text-xs font-bold text-slate-500 uppercase">Unique Insights / Data</Label>
+                <Textarea 
+                  id="uniqueInsights" 
+                  placeholder="Add specific stats, data points, or expert facts to avoid generic AI text..." 
+                  className="bg-slate-50/50 min-h-[80px] resize-none text-sm"
+                  value={uniqueInsights}
+                  onChange={(e) => setUniqueInsights(e.target.value)}
+                />
+                <p className="text-[10px] text-primary italic font-medium">Injects E.E.A.T and uniqueness.</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="objective" className="text-xs font-bold text-slate-500 uppercase">Core Objective</Label>
+                <div className="relative">
+                  <Target className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                  <Input 
+                    id="objective" 
+                    placeholder="The main takeaway for the reader" 
+                    className="bg-slate-50/50 pl-8"
+                    value={coreObjective}
+                    onChange={(e) => setCoreObjective(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="tone" className="text-xs font-bold text-slate-500 uppercase">Tone of Voice</Label>
                 <Select value={tone} onValueChange={setTone}>
                   <SelectTrigger className="bg-slate-50/50">
@@ -316,39 +364,14 @@ export default function RankForgeEditor() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-xs font-bold text-slate-500 uppercase">Company Description</Label>
-                <Textarea 
-                  id="description" 
-                  placeholder="Brief overview..." 
-                  className="bg-slate-50/50 min-h-[80px] resize-none text-sm"
-                  value={companyDescription}
-                  onChange={(e) => setCompanyDescription(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="keywords" className="text-xs font-bold text-slate-500 uppercase">Target Keywords</Label>
                 <Textarea 
                   id="keywords" 
                   placeholder="keyword1, keyword2..." 
-                  className="bg-slate-50/50 min-h-[80px] resize-none"
+                  className="bg-slate-50/50 min-h-[60px] resize-none"
                   value={keywords}
                   onChange={(e) => setKeywords(e.target.value)}
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="geo" className="text-xs font-bold text-slate-500 uppercase">G.E.O Focus</Label>
-                <div className="relative">
-                  <BrainCircuit className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-primary" />
-                  <Input 
-                    id="geo" 
-                    placeholder="SearchGPT, Google SGE..." 
-                    className="bg-slate-50/50 pl-8 h-8 text-sm"
-                    value={geoOptimization}
-                    onChange={(e) => setGeoOptimization(e.target.value)}
-                  />
-                </div>
               </div>
 
               <div className="space-y-2">

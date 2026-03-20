@@ -10,7 +10,9 @@ import {z} from 'genkit';
 const GenerateSeoDraftArticleInputSchema = z.object({
   topic: z.string().describe('Main subject.'),
   keywords: z.array(z.string()).describe('Target SEO keywords.'),
-  audienceInsights: z.string().optional(),
+  audienceInsights: z.string().optional().describe('Description of the target audience.'),
+  uniqueInsights: z.string().optional().describe('Specific data points, unique facts, or personal expertise to include.'),
+  coreObjective: z.string().optional().describe('The primary goal or takeaway for the reader.'),
   outputFormat: z.enum(['article', 'outline']),
   companyName: z.string().optional(),
   companyDescription: z.string().optional(),
@@ -59,24 +61,31 @@ const articlePrompt = ai.definePrompt({
   prompt: `Act as a professional SEO/G.E.O Content Engineer. 
 Goal: Generate high-quality content AND SEO intelligence in ONE PASS.
 
+STRICT CONSTRAINT ON ORIGINALITY: 
+- DO NOT start with generic tropes like "In a world...", "In today's fast-paced environment...", or "At its heart...".
+- Use the provided Unique Insights/Data to lead the article with a definitive, fresh perspective.
+
 INPUT:
 Topic: {{{topic}}}
 Keywords: {{#each keywords}}"{{this}}" {{/each}}
 {{#if companyName}}Brand: {{{companyName}}} ({{{companyDescription}}}){{/if}}
+Target Audience: {{{audienceInsights}}}
+Unique Insights/Data: {{{uniqueInsights}}}
+Core Objective: {{{coreObjective}}}
 Tone: {{{tone}}}
 Target length: {{#if targetWordCount}}{{{targetWordCount}}}{{else}}1000{{/if}} words.
 
 STRICT CONSTRAINTS:
-1. WORD COUNT: The generated {{outputFormat}} MUST be as close as possible to {{{targetWordCount}}} words. If the target is high, expand on examples, case studies, and detailed technical explanations. If low, be concise and punchy. Do not ignore this limit.
+1. WORD COUNT: The generated {{outputFormat}} MUST be as close as possible to {{{targetWordCount}}} words. Expand on examples and data if target is high.
 2. FORMAT: Proper Markdown. Use TWO newlines between paragraphs.
 3. INTELLIGENCE: Provide actionable SEO insights in the seoAnalysis field.
-4. E.E.A.T: Ensure high expertise and citability for AI search engines.
+4. E.E.A.T: Prioritize the Unique Insights/Data to build authority. Ensure the content is "citeable" for AI engines.
 
 {{#if isArticle}}
 ARTICLE STRUCTURE:
 - H1 Title (# Title)
-- Engaging Intro
-- Multiple H2/H3 sections (at least 5 major sections for articles over 1000 words)
+- Hook-driven Intro (Using specific data/insights)
+- Multiple H2/H3 sections
 - Natural keyword integration
 - Definitive conclusion
 {{/if}}
